@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ConnectUs.Domain.DTO;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Infrastructure.Repositories;

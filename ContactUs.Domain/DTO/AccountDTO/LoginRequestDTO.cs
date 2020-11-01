@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ConnectUs.Domain.DTO
+namespace ConnectUs.Domain.DTO.AccountDTO
 {
     public class LoginRequestDTO
     {

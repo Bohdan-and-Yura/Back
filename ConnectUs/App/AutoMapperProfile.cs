@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using ConnectUs.Domain.DTO;
+﻿using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
