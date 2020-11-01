@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
+using ConnectUs.Domain.IRepositories;
+using ConnectUs.Infrastructure.Repositories;
 
 namespace ConnectUs
 {
@@ -31,6 +33,9 @@ namespace ConnectUs
         {
             services.AddControllers();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IMeetupService, MeetupService>();
+
             services.AddDbContext<BaseDbContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });

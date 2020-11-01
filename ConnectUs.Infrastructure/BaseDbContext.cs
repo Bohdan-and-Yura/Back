@@ -14,6 +14,7 @@ namespace ConnectUs.Infrastructure
 
         }
         public DbSet<User> Users { get; set; } 
+        public DbSet<Meetup> Meetups { get; set; } 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
