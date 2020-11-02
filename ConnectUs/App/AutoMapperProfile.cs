@@ -13,6 +13,7 @@ namespace ConnectUs.Web.App
     {
         public AutoMapperProfile()
         {
+            UserModels();
         }
 
         public AutoMapperProfile(string profileName) : base(profileName)
@@ -21,7 +22,41 @@ namespace ConnectUs.Web.App
         }
         protected void UserModels()
         {
-            CreateMap<RegisterDTO, User>();
+            CreateMap<RegisterDTO, User>()
+                .ForMember(c => c.AccessFailedCount, o => o.Ignore())
+                .ForMember(c => c.ConcurrencyStamp, o => o.Ignore())
+                .ForMember(c => c.EmailConfirmed, o => o.Ignore())
+                .ForMember(c => c.Id, o => o.Ignore())
+                .ForMember(c => c.LockoutEnabled, o => o.Ignore())
+                .ForMember(c => c.LockoutEnd, o => o.Ignore())
+                .ForMember(c => c.Meetups, o => o.Ignore())
+                .ForMember(c => c.NormalizedEmail, o => o.Ignore())
+                .ForMember(c => c.NormalizedUserName, o => o.Ignore())
+                .ForMember(c => c.PasswordHash, o => o.Ignore())
+                .ForMember(c => c.PasswordSalt, o => o.Ignore())
+                .ForMember(c => c.PhoneNumber, o => o.Ignore())
+                .ForMember(c => c.PhoneNumberConfirmed, o => o.Ignore())
+                .ForMember(c => c.SecurityStamp, o => o.Ignore())
+                .ForMember(c => c.TwoFactorEnabled, o => o.Ignore());
+
+            CreateMap<LoginRequestDTO, User>()
+                .ForMember(c => c.AccessFailedCount, o => o.Ignore())
+                .ForMember(c => c.ConcurrencyStamp, o => o.Ignore())
+                .ForMember(c => c.ConfirmPassword, o => o.Ignore())
+                .ForMember(c => c.EmailConfirmed, o => o.Ignore())
+                .ForMember(c => c.Id, o => o.Ignore())
+                .ForMember(c => c.LockoutEnabled, o => o.Ignore())
+                .ForMember(c => c.LockoutEnd, o => o.Ignore())
+                .ForMember(c => c.Meetups, o => o.Ignore())
+                .ForMember(c => c.NormalizedEmail, o => o.Ignore())
+                .ForMember(c => c.NormalizedUserName, o => o.Ignore())
+                .ForMember(c => c.PasswordHash, o => o.Ignore())
+                .ForMember(c => c.PasswordSalt, o => o.Ignore())
+                .ForMember(c => c.PhoneNumber, o => o.Ignore())
+                .ForMember(c => c.PhoneNumberConfirmed, o => o.Ignore())
+                .ForMember(c => c.SecurityStamp, o => o.Ignore())
+                .ForMember(c => c.TwoFactorEnabled, o => o.Ignore())
+                .ForMember(c => c.UserName, o => o.Ignore());
         }
     }
 }

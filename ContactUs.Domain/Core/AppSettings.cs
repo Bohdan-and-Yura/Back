@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConnectUs.Domain.Helpers
+namespace ConnectUs.Domain.Core
 {
     /// <summary>
     /// Contains properties defined in the appsettings.json file.

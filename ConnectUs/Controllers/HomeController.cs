@@ -8,6 +8,7 @@ using ConnectUs.Domain.Enums;
 using ConnectUs.Domain.IRepositories;
 using ConnectUs.Domain.ViewModels;
 using ConnectUs.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace ConnectUs.Web.Controllers
             _meetup = meetupService;
         }
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<HomeIndexResponse>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate)
         {
             int pageSize = 18;

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Unicode;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories
 {
@@ -63,19 +64,20 @@ namespace ConnectUs.Infrastructure.Repositories
         }
 
 
-        public RegisterDTO Create(RegisterDTO registerDTO, string password)
+        public async Task<User> CreateAsync(User newUser)
         {
-            if (string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(newUser.Password))
                 throw new AppException("Password is required");
-            if (_context.Users.Any(c => c.Email == registerDTO.Email))
+            if (_context.Users.Any(c => c.Email == newUser.Email))
                 throw new AppException("Email is already taken");
             byte[] passwordHash;
             byte[] passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
-            registerDTO.PasswordHash = passwordHash;
-            registerDTO.PasswordSalt = passwordSalt;
-            //Mapper.Map<CreatingModel>(entity))
-            return registerDTO;
+            CreatePasswordHash(newUser.Password, out passwordHash, out passwordSalt);
+            newUser.PasswordHash = passwordHash;
+            newUser.PasswordSalt = passwordSalt;
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+            return newUser;
 
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

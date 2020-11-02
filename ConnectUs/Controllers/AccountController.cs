@@ -5,10 +5,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using ConnectUs.Domain.Core;
 using ConnectUs.Domain.DTO;
 using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
+using ConnectUs.Domain.IRepositories;
 using ConnectUs.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,31 +24,51 @@ namespace ConnectUs.Web.Controllers
 {
     [Route("api/account")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly AccountService account;
-        private readonly UserManager<User> _userManager;
+        private readonly IAccountService account;
         private readonly SignInManager<User> _signInManager;
         private readonly AppSettings _appSettings;
         private readonly ILogger _logger;
-        public AccountController(AccountService accountService, UserManager<User> userManager,
+        private readonly IMapper _mapper;
+        public AccountController(IAccountService accountService, UserManager<User> userManager,
                     SignInManager<User> signInManager,
-                    ILogger<AccountController> logger
+                    ILogger<AccountController> logger,
+                    IMapper mapper
             )
         {
             account = accountService;
-            _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<RegisterDTO>> Register([FromBody] RegisterDTO registerDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var user =_mapper.Map<User>(registerDTO);
+                var result = await account.CreateAsync(user);
+                if (result!=null)
+                {
+                    // установка куки
+                    await _signInManager.SignInAsync(user, false);
+
+                    return Ok();
+                }
+            }
+            return BadRequest("register model is not valid");
+
+        }
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequestDTO model)
         {
             var user = account.Authenticate(model.Email, model.Password);
-
+            
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 

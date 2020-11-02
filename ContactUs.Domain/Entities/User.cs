@@ -8,6 +8,11 @@ namespace ConnectUs.Domain.Entities
 {
     public class User : IdentityUser
     {
+        public new string Email { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+
+
         public new byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
