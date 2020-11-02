@@ -35,7 +35,10 @@ namespace ConnectUs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+
+
+            services.AddCors();
+
             services.AddControllers();
             
             #region automapper
@@ -78,6 +81,14 @@ namespace ConnectUs
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
+            // custom jwt auth middleware
+
 
             app.UseEndpoints(endpoints =>
             {

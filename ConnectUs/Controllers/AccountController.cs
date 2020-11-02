@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ConnectUs.Web.Controllers
@@ -32,16 +33,18 @@ namespace ConnectUs.Web.Controllers
         private readonly AppSettings _appSettings;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
-        public AccountController(IAccountService accountService, UserManager<User> userManager,
+        public AccountController(IAccountService accountService,
                     SignInManager<User> signInManager,
                     ILogger<AccountController> logger,
-                    IMapper mapper
+                    IMapper mapper,
+                    IOptions<AppSettings> appSettings
             )
         {
             account = accountService;
             _signInManager = signInManager;
             _logger = logger;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
         }
 
         [AllowAnonymous]
@@ -50,9 +53,9 @@ namespace ConnectUs.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user =_mapper.Map<User>(registerDTO);
+                var user = _mapper.Map<User>(registerDTO);
                 var result = await account.CreateAsync(user);
-                if (result!=null)
+                if (result != null)
                 {
                     // установка куки
                     await _signInManager.SignInAsync(user, false);
@@ -63,31 +66,33 @@ namespace ConnectUs.Web.Controllers
             return BadRequest("register model is not valid");
 
         }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequestDTO model)
         {
             var user = account.Authenticate(model.Email, model.Password);
-            
+
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
+
+            var Subject = new ClaimsIdentity(new Claim[]
+               {
                     new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+               });
+            var jwt = new JwtSecurityToken(
+                     issuer: AuthOptions.ISSUER,
+                     audience: AuthOptions.AUDIENCE,
+                     notBefore: DateTime.UtcNow,
+                     claims: Subject.Claims,
+                     expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
+                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
+
 
             // return basic user info and authentication token
-            return Ok(new
+            return Ok(new LoginResponseDTO
             {
                 Id = user.Id,
                 Username = user.UserName,

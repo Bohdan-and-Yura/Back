@@ -29,7 +29,6 @@ namespace ConnectUs.Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
-
             var user = _context.Users.SingleOrDefault(x => x.Email == email);
 
             // check if username exists
@@ -37,7 +36,7 @@ namespace ConnectUs.Infrastructure.Repositories
                 return null;
 
             // check if password is correct
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            if (!VerifyPasswordHash(password, user.PasswordHashByte, user.PasswordSaltByte))
                 return null;
 
             // authentication successful
@@ -73,8 +72,8 @@ namespace ConnectUs.Infrastructure.Repositories
             byte[] passwordHash;
             byte[] passwordSalt;
             CreatePasswordHash(newUser.Password, out passwordHash, out passwordSalt);
-            newUser.PasswordHash = passwordHash;
-            newUser.PasswordSalt = passwordSalt;
+            newUser.PasswordHashByte = passwordHash;
+            newUser.PasswordSaltByte = passwordSalt;
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
             return newUser;
