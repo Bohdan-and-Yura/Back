@@ -2,6 +2,7 @@
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,10 +66,9 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<User> CreateAsync(User newUser)
         {
-            if (string.IsNullOrEmpty(newUser.Password))
-                throw new ArgumentException("Password is required");
+            
             if (_context.Users.Any(c => c.Email == newUser.Email))
-                throw new ArgumentException("Email is already taken");
+                return null;
             byte[] passwordHash;
             byte[] passwordSalt;
             CreatePasswordHash(newUser.Password, out passwordHash, out passwordSalt);
@@ -81,8 +81,7 @@ namespace ConnectUs.Infrastructure.Repositories
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            if (string.IsNullOrEmpty(password))
-                throw new ArgumentNullException("password");
+            
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;

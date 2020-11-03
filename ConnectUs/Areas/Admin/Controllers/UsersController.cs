@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ConnectUs.Domain.Core;
 using ConnectUs.Domain.Entities;
+using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,8 +16,8 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     /// for users control
     /// </summary>
     [Route("api/admin/users")]
-    [Authorize]
     [ApiController]
+    [Authorize(Roles = Role.Admin)]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -25,28 +26,27 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = Role.Admin)]
         [HttpGet]
-        public ActionResult<IEnumerable<User>> GetAll()
+        public ActionResult<ResponseModel<IEnumerable<User>>> GetAll()
         {
             var users = _userService.GetAll();
-            return Ok(users);
+            return Ok(new ResponseModel<IEnumerable<User>>(users));
         }
+         [HttpGet("{id}")]
 
-        [HttpGet("{id}")]
-        public ActionResult<User> GetById(string id)
+        public ActionResult<ResponseModel<User>> GetById(string id)
         {
             // only allow admins to access other user records
             var currentUserId = User.Identity.Name;
             if (id != currentUserId && !User.IsInRole(Role.Admin))
-                return Forbid();
+                return BadRequest(new ResponseModel<User>("Forbidden"));
 
             var user = _userService.GetById(id);
 
             if (user == null)
-                return NotFound();
+                return NotFound(new ResponseModel<User>("Forbidden"));
 
-            return Ok(user);
+            return Ok(new ResponseModel<User>(user));
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ConnectUs.Domain.DTO.PageResponseDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
+using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
 using ConnectUs.Domain.ViewModels;
 using ConnectUs.Infrastructure.Repositories;
@@ -30,7 +31,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<HomeIndexResponse>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false)
+        public async Task<ActionResult<ResponseModel<HomeIndexResponse>>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false)
         {
             int pageSize = 18;
 
@@ -39,11 +40,13 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             PageViewModel pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
             var items = meetups.Skip(page - 1).Take(pageSize);
 
-            return new HomeIndexResponse
+            var result = new HomeIndexResponse
             {
                 Meetups = items,
                 PageView = pageViewModel
             };
+            return new ResponseModel<HomeIndexResponse>(result);
+
         }
     }
 }

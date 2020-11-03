@@ -28,7 +28,6 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     /// </summary>
     [Route("api/account")]
     [ApiController]
-    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService account;
@@ -50,6 +49,10 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (string.IsNullOrEmpty(registerDTO.Password))
+                    return BadRequest(new ResponseModel<RegisterDTO>("Passord cannot be empty", registerDTO));
+                
+
                 var user = _mapper.Map<User>(registerDTO);
                 user.Role = Role.User;
                 var result = await account.CreateAsync(user);
@@ -58,11 +61,16 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                     // установка куки
                     await _signInManager.SignInAsync(user, false);
 
-                    return Ok(0);
+                    return Ok(new ResponseModel<RegisterDTO>());
+                   
+                }
+                else
+                {
+                        return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
                 }
             }
            
-            return BadRequest(1);
+            return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
 
         }
 
@@ -73,7 +81,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             var user = account.Authenticate(model.Email, model.Password);
 
             if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return BadRequest(new ResponseModel<LoginRequestDTO>("Username or password is incorrect", model));
 
 
             var Subject = new ClaimsIdentity(new Claim[]
@@ -90,25 +98,28 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                      signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-
-            // return basic user info and authentication token
-            return Ok(new LoginResponseDTO
+            var responseData = new LoginResponseDTO
             {
                 Id = user.Id,
                 Username = user.UserName,
                 Token = tokenString
-            });
+            };
+            // returns basic user info and authentication token
+            return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
+
         public async Task<IActionResult> Logout()
         {
-            // удаляем аутентификационные куки
+            // удаляем аутентификационные куки  
             await _signInManager.SignOutAsync();
-            return RedirectToLocal("Index");
+            return Accepted((new ResponseModel<LoginResponseDTO>()));
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<EditUserDTO>> Edit(EditUserDTO model)
         {
             if (ModelState.IsValid)
@@ -117,46 +128,25 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 var result = await account.UpdateAsync(model);
                 if (result != null)
                 {
-                    return RedirectToAction("Index");
+                    return Ok(new ResponseModel<EditUserDTO>(model));
                 }
                 else
                 {
-                    throw new AppException("Updating error");
+                    return BadRequest(new ResponseModel<EditUserDTO>("Updating error", model)); 
                 }
 
             }
-            return Ok(model);
+            return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
             await account.DeleteAsync(id);
-            return RedirectToLocal("Index");
+            return Accepted(new ResponseModel<EditUserDTO>());
         }
 
-        #region Helpers
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
-
-        private IActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
-        }
-
-        #endregion
+       
     }
 }
