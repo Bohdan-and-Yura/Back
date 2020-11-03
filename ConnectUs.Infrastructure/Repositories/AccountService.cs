@@ -66,9 +66,9 @@ namespace ConnectUs.Infrastructure.Repositories
         public async Task<User> CreateAsync(User newUser)
         {
             if (string.IsNullOrEmpty(newUser.Password))
-                throw new AppException("Password is required");
+                throw new ArgumentException("Password is required");
             if (_context.Users.Any(c => c.Email == newUser.Email))
-                throw new AppException("Email is already taken");
+                throw new ArgumentException("Email is already taken");
             byte[] passwordHash;
             byte[] passwordSalt;
             CreatePasswordHash(newUser.Password, out passwordHash, out passwordSalt);
@@ -88,6 +88,28 @@ namespace ConnectUs.Infrastructure.Repositories
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
+        }
+
+        public async Task<EditUserDTO> UpdateAsync(EditUserDTO editModel)
+        {
+            User user = GetUserByEmail(editModel.Email);
+            if (user != null)
+            {
+                user.BirthDay = editModel.BirthDay;
+                user.UserName = editModel.UserName;
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return editModel;
+            }
+            return null;
+        }
+
+        public async Task DeleteAsync(string email)
+        {
+            User user = GetUserByEmail(email);
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
         }
     }
 }

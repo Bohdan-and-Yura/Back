@@ -9,10 +9,13 @@ namespace ConnectUs.Domain.Entities
 {
     public class User : IdentityUser
     {
+        public string Role { get; set; }
+        public string Token { get; set; }
+        public DateTime BirthDay { get; set; }
+
         public string Password { get; set; }
         [NotMapped]
         public string ConfirmPassword { get; set; }
-
 
         public byte[] PasswordHashByte { get; set; }
         public byte[] PasswordSaltByte { get; set; }

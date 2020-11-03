@@ -38,6 +38,9 @@ namespace ConnectUs.Web.App
                 .ForMember(c => c.PhoneNumber, o => o.Ignore())
                 .ForMember(c => c.PhoneNumberConfirmed, o => o.Ignore())
                 .ForMember(c => c.SecurityStamp, o => o.Ignore())
+                .ForMember(c => c.Role, o => o.Ignore())
+                .ForMember(c => c.Token, o => o.Ignore())
+                .ForMember(c => c.BirthDay, o => o.Ignore())
                 .ForMember(c => c.TwoFactorEnabled, o => o.Ignore());
 
             CreateMap<LoginRequestDTO, User>()
@@ -58,7 +61,10 @@ namespace ConnectUs.Web.App
                 .ForMember(c => c.PhoneNumberConfirmed, o => o.Ignore())
                 .ForMember(c => c.SecurityStamp, o => o.Ignore())
                 .ForMember(c => c.TwoFactorEnabled, o => o.Ignore())
-                .ForMember(c => c.UserName, o => o.Ignore());
+                .ForMember(c => c.UserName, o => o.Ignore())
+                .ForMember(c => c.Role, o => o.Ignore())
+                .ForMember(c => c.Token, o => o.Ignore())
+                .ForMember(c => c.BirthDay, o => o.Ignore());
         }
     }
 }

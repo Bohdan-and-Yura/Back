@@ -13,14 +13,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ConnectUs.Web.Controllers
+namespace ConnectUs.Web.Areas.Public.Controllers
 {
+    /// <summary>
+    /// public
+    /// </summary>
     [Route("api/home")]
     [ApiController]
     public class HomeController : ControllerBase
     {
         private readonly IMeetupService _meetup;
-        private SortState current = SortState.None;
 
         public HomeController(IMeetupService meetupService)
         {
@@ -28,28 +30,20 @@ namespace ConnectUs.Web.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<HomeIndexResponse>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate)
+        public async Task<ActionResult<HomeIndexResponse>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false)
         {
             int pageSize = 18;
-            List<Meetup> meetups;
-            if (sortState != current)
-            {
-                meetups = await _meetup.GetList(searchQuery, sortState).AsNoTracking().ToListAsync();
-            }
-            else
-            {
-                current = sortState;
-                meetups = await _meetup.GetList(searchQuery, sortState, true).AsNoTracking().ToListAsync();
-            }
+
+            List<Meetup> meetups = await _meetup.GetList(searchQuery, sortState, isDescending).AsNoTracking().ToListAsync();
+
             PageViewModel pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
             var items = meetups.Skip(page - 1).Take(pageSize);
 
-            HomeIndexResponse response = new HomeIndexResponse
+            return new HomeIndexResponse
             {
                 Meetups = items,
                 PageView = pageViewModel
             };
-            return response;
         }
     }
 }

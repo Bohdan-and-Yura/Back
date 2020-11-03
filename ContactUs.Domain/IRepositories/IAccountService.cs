@@ -13,5 +13,7 @@ namespace ConnectUs.Domain.IRepositories
         User GetUserByEmail(string username);
         User Authenticate(string email, string password);
         Task<User> CreateAsync(User registerDTO);
+        Task<EditUserDTO> UpdateAsync(EditUserDTO user);
+        Task DeleteAsync(string id);
     }
 }

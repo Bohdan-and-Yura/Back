@@ -14,7 +14,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:51045"
+      "applicationUrl": ""
     },
     "ConnectUs": {
       "commandName": "Project",
