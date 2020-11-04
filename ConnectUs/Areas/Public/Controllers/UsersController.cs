@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.Core;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
@@ -15,38 +17,42 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     /// <summary>
     /// for users control
     /// </summary>
-    [Route("api/admin/users")]
+    [Route("api/users")]
     [ApiController]
-    [Authorize(Roles = Role.Admin)]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UsersController(IUserService userService)
+        private readonly IMapper _mapper;
+
+        public UsersController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public ActionResult<ResponseModel<IEnumerable<User>>> GetAll()
         {
             var users = _userService.GetAll();
-            return Ok(new ResponseModel<IEnumerable<User>>(users));
+            var result = _mapper.Map<IEnumerable<UserDTO>>(users);
+            return Ok(new ResponseModel<IEnumerable<UserDTO>>(result));
         }
-         [HttpGet("{id}")]
 
-        public ActionResult<ResponseModel<User>> GetById(string id)
+
+        [HttpGet("{id}")]
+        public ActionResult<ResponseModel<UserDTO>> GetById([FromQuery] string id)
         {
             // only allow admins to access other user records
-            var currentUserId = User.Identity.Name;
-            if (id != currentUserId && !User.IsInRole(Role.Admin))
-                return BadRequest(new ResponseModel<User>("Forbidden"));
-
             var user = _userService.GetById(id);
-
             if (user == null)
-                return NotFound(new ResponseModel<User>("Forbidden"));
+                return NotFound(new ResponseModel<UserDTO>("User not found"));
 
-            return Ok(new ResponseModel<User>(user));
+            var result = _mapper.Map<UserDTO>(user);
+            return Ok(new ResponseModel<UserDTO>(result));
         }
+
+
+        //does administrator can create or update user??
+
     }
 }

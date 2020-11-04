@@ -12,6 +12,7 @@ namespace ConnectUs.Domain.Entities
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime MeetupDate { get; set; }
+        public string CreatedByUser { get; set; }
         public User User { get; set; }
     }
 }

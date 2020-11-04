@@ -46,11 +46,15 @@ namespace ConnectUs
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddAutoMapper(typeof(AutoMapperProfile));
+            
             var mapperConfig = new MapperConfiguration(mc =>
             {
+                
                 mc.AddProfile(new AutoMapperProfile());
             });
+            
             IMapper mapper = mapperConfig.CreateMapper();
+            
             services.AddSingleton(mapper);
 
             #endregion
@@ -71,8 +75,9 @@ namespace ConnectUs
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    //ValidateIssuer = false,
+                    ValidateAudience = false,
+                    //ValidateLifetime = false,
                 };
             });
 
@@ -84,11 +89,11 @@ namespace ConnectUs
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-            services.AddIdentity<User, IdentityRole>(x => x.User.RequireUniqueEmail = true)
-                    .AddEntityFrameworkStores<BaseDbContext>()
+            services.AddIdentity<User, IdentityRole>()
+                   .AddEntityFrameworkStores<BaseDbContext>()
                     .AddDefaultTokenProviders();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-
+            services.AddMemoryCache();
             services.AddControllers();
 
         }

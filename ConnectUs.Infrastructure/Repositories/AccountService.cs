@@ -3,6 +3,7 @@ using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,11 @@ namespace ConnectUs.Infrastructure.Repositories
         public User GetUserByEmail(string userName)
         {
             return _context.Users.FirstOrDefault(c => c.Email.ToLower() == userName.ToLower());
+
+        }
+        public async Task<User> GetUserById(string id)
+        {
+            return await _context.Users.FirstOrDefaultAsync(c => c.Id == id);
 
         }
         public User Authenticate(string email, string password)
@@ -66,7 +72,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<User> CreateAsync(User newUser)
         {
-            
+
             if (_context.Users.Any(c => c.Email == newUser.Email))
                 return null;
             byte[] passwordHash;
@@ -81,7 +87,7 @@ namespace ConnectUs.Infrastructure.Repositories
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
-            
+
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
@@ -89,9 +95,9 @@ namespace ConnectUs.Infrastructure.Repositories
             }
         }
 
-        public async Task<EditUserDTO> UpdateAsync(EditUserDTO editModel)
+        public async Task<EditUserDTO> UpdateAsync(string id, EditUserDTO editModel)
         {
-            User user = GetUserByEmail(editModel.Email);
+            User user =await GetUserById(id);
             if (user != null)
             {
                 user.BirthDay = editModel.BirthDay;
@@ -103,9 +109,9 @@ namespace ConnectUs.Infrastructure.Repositories
             return null;
         }
 
-        public async Task DeleteAsync(string email)
+        public async Task DeleteAsync(string id)
         {
-            User user = GetUserByEmail(email);
+            User user = await GetUserById(id);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 

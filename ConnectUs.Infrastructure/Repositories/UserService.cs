@@ -1,10 +1,12 @@
 ﻿using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories
 {
@@ -17,17 +19,27 @@ namespace ConnectUs.Infrastructure.Repositories
             _context = baseDbContext;
         }
 
-        
+        public async Task<bool> Delete(string id)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.Id == id);
+            if (user == null)
+                return false;
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         public IEnumerable<User> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.Users.ToList();
         }
 
         public User GetById(string id)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == id);
+            var user = _context.Users.Include(c=>c.Meetups).FirstOrDefault(x => x.Id == id);
             return user.WithoutPassword();
         }
+
+       
     }
 }

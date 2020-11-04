@@ -51,7 +51,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             {
                 if (string.IsNullOrEmpty(registerDTO.Password))
                     return BadRequest(new ResponseModel<RegisterDTO>("Passord cannot be empty", registerDTO));
-                
+
 
                 var user = _mapper.Map<User>(registerDTO);
                 user.Role = Role.User;
@@ -62,14 +62,14 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                     await _signInManager.SignInAsync(user, false);
 
                     return Ok(new ResponseModel<RegisterDTO>());
-                   
+
                 }
                 else
                 {
-                        return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
+                    return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
                 }
             }
-           
+
             return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
 
         }
@@ -107,7 +107,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             // returns basic user info and authentication token
             return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
-        [HttpPost]
+        [HttpPost("logout")]
         [ValidateAntiForgeryToken]
         [Authorize]
 
@@ -118,35 +118,35 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             return Accepted((new ResponseModel<LoginResponseDTO>()));
         }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<ActionResult<EditUserDTO>> Edit(EditUserDTO model)
+        [HttpPut("{id}")]
+        //[Authorize]
+        public async Task<ActionResult<EditUserDTO>> Edit(string id, [FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
             {
 
-                var result = await account.UpdateAsync(model);
+                var result = await account.UpdateAsync(id, model);
                 if (result != null)
                 {
                     return Ok(new ResponseModel<EditUserDTO>(model));
                 }
                 else
                 {
-                    return BadRequest(new ResponseModel<EditUserDTO>("Updating error", model)); 
+                    return BadRequest(new ResponseModel<EditUserDTO>("Updating error", model));
                 }
 
             }
             return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpDelete("{id}")]
+        //[Authorize]
         public async Task<IActionResult> Delete(string id)
         {
             await account.DeleteAsync(id);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
 
-       
+
     }
 }
