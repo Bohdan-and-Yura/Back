@@ -8,5 +8,6 @@ namespace ConnectUs.Domain.Enums
     {
         Title,
         MeetupDate,
+        City
     }
 }

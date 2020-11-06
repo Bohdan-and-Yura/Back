@@ -4,6 +4,7 @@ using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace ConnectUs.Infrastructure.Repositories
         }
         public async Task<User> GetUserById(string id)
         {
-            return await _context.Users.Include(c=>c.Meetups).FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Users.Include(c => c.Meetups).FirstOrDefaultAsync(c => c.Id == id);
 
         }
         public User Authenticate(string email, string password)
@@ -38,7 +39,7 @@ namespace ConnectUs.Infrastructure.Repositories
                 return null;
             var user = _context.Users.SingleOrDefault(x => x.Email == email);
 
-            // check if username exists
+            // check if userexists
             if (user == null)
                 return null;
 
@@ -97,7 +98,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<EditUserDTO> UpdateAsync(string id, EditUserDTO editModel)
         {
-            User user =await GetUserById(id);
+            User user = await GetUserById(id);
             if (user != null)
             {
                 user.BirthDay = editModel.BirthDay;

@@ -40,7 +40,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
 
         [HttpGet("{id}")]
-        public ActionResult<ResponseModel<UserDTO>> GetById(string id)
+        public ActionResult<ResponseModel<UserDTO>> Fetch(string id)
         {
             // only allow admins to access other user records
             var user = _userService.GetByIdAsync(id);

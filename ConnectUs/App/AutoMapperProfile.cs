@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO;
 using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -15,11 +16,19 @@ namespace ConnectUs.Web.App
         {
             
             UserModels();
+            MeetupAdminModels();
         }
 
         public AutoMapperProfile(string profileName) : base(profileName)
         {
             UserModels();
+            MeetupAdminModels();
+        }
+        protected void MeetupAdminModels()
+        {
+            CreateMap<CreateMeetupDTO, Meetup>();
+            CreateMap<Meetup, MeetupResponseDTO>();
+            CreateMap<MeetupUpdateDTO, Meetup>();
         }
         protected void UserModels()
         {

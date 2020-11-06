@@ -13,6 +13,8 @@ using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
 using ConnectUs.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -76,7 +78,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public ActionResult<LoginResponseDTO> Login([FromBody] LoginRequestDTO model)
+        public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO model)
         {
             var user = account.Authenticate(model.Email, model.Password);
 
@@ -84,20 +86,26 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 return BadRequest(new ResponseModel<LoginRequestDTO>("Username or password is incorrect", model));
 
 
-            var Subject = new ClaimsIdentity(new Claim[]
+            var Subject = new List<Claim>
                {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
                     new Claim(ClaimTypes.Role, user.Role)
-               });
+               };
+            var claimsIdentity = new ClaimsIdentity(Subject, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties();
+
             var jwt = new JwtSecurityToken(
                      issuer: AuthOptions.ISSUER,
                      audience: AuthOptions.AUDIENCE,
                      notBefore: DateTime.UtcNow,
-                     claims: Subject.Claims,
+                     claims: Subject,
                      expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
                      signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
-
+            await HttpContext.SignInAsync(
+               CookieAuthenticationDefaults.AuthenticationScheme,
+               new ClaimsPrincipal(claimsIdentity),
+               authProperties);
             var responseData = new LoginResponseDTO
             {
                 Id = user.Id,
@@ -119,7 +127,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
 
         [HttpPut("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<EditUserDTO>> Edit(string id, [FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
@@ -140,13 +148,12 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
 
         [HttpDelete("{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
             await account.DeleteAsync(id);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
-
 
     }
 }

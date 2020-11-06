@@ -40,7 +40,7 @@ namespace ConnectUs.Infrastructure.Repositories
             {
                 return await _context.Meetups/*.Include(c=>c.Users)*/.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
             }
-            catch 
+            catch
             {
                 return null;
             }
@@ -63,7 +63,13 @@ namespace ConnectUs.Infrastructure.Repositories
                     case SortState.MeetupDate:
                         meetups.OrderBy(c => c.MeetupDate);
                         break;
-
+                    case SortState.City:
+                        meetups.OrderBy(c => c.City);
+                        if (!string.IsNullOrEmpty(searchQuery))
+                        {
+                            meetups.Where(c => c.City.Contains(searchQuery));
+                        }
+                        break;
                     default:
                         meetups.OrderBy(c => c.Title);
                         break;
@@ -84,7 +90,13 @@ namespace ConnectUs.Infrastructure.Repositories
                     case SortState.MeetupDate:
                         meetups.OrderByDescending(c => c.MeetupDate);
                         break;
-
+                    case SortState.City:
+                        meetups.OrderByDescending(c => c.City);
+                        if (!string.IsNullOrEmpty(searchQuery))
+                        {
+                            meetups.Where(c => c.City.Contains(searchQuery));
+                        }
+                        break;
                     default:
                         meetups.OrderBy(c => c.Title);
                         break;

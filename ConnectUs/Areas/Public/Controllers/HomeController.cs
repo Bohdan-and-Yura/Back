@@ -27,26 +27,24 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     {
         private readonly IMeetupService _meetup;
         private readonly IUserService _userService;
-        private readonly IUsersMeetupService _usersMeetupService;
         private readonly IMapper _mapper;
 
-        public HomeController(IMeetupService meetupService, IUserService userService, IUsersMeetupService usersMeetupService, IMapper mapper)
+        public HomeController(IMeetupService meetupService, IUserService userService, IMapper mapper)
         {
             _meetup = meetupService;
             _userService = userService;
-            _usersMeetupService = usersMeetupService;
             _mapper = mapper;
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseModel<HomeIndexResponse>>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false)
+        public async Task<ActionResult<ResponseModel<HomeIndexResponse>>> Index([FromQuery] int page = 1, string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false, int meetupsCount=18)
         {
             int pageSize = 18;
 
             List<Meetup> meetups = await _meetup.GetList(searchQuery, sortState, isDescending).AsNoTracking().ToListAsync();
 
             PageViewModel pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
-            var items = meetups.Skip(page - 1).Take(pageSize);
+            var items = meetups.Skip(page - 1).Take(meetupsCount);
 
             var result = new HomeIndexResponse
             {
