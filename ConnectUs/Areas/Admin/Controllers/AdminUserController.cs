@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ConnectUs.Web.Areas.Admin.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin/users")]
     [ApiController]
     //[Authorize(Roles = Role.Admin)]
 

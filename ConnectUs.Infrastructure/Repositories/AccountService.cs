@@ -29,7 +29,7 @@ namespace ConnectUs.Infrastructure.Repositories
         }
         public async Task<User> GetUserById(string id)
         {
-            return await _context.Users.FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Users.Include(c=>c.Meetups).FirstOrDefaultAsync(c => c.Id == id);
 
         }
         public User Authenticate(string email, string password)

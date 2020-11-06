@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConnectUs.Domain.DTO.MeetupDTO
 {
-    public class MeetupResponse
+    public class GetMeetupResponse
     {
 
     }

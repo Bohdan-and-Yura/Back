@@ -1,4 +1,6 @@
-﻿using ConnectUs.Domain.Entities;
+﻿using AutoMapper;
+using ConnectUs.Domain.DTO.MeetupDTO;
+using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
 using ConnectUs.Domain.IRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories
 {
@@ -18,9 +21,34 @@ namespace ConnectUs.Infrastructure.Repositories
         {
             _context = baseDbContext;
         }
+
+        public async Task AddUserToMeetup_AddMeetupToUserAsync(Meetup meetup, User user)
+        {
+            MeetupUser mu = new MeetupUser();
+            mu.Meetup = meetup;
+            mu.User = user;
+            user.Meetups.Add(mu);
+            meetup.Users.Add(mu);
+            _context.MeetupsUsers.Add(mu);
+            await _context.SaveChangesAsync();
+
+        }
+
+        public async Task<Meetup> GetByIdAsync(string meetupId)
+        {
+            try
+            {
+                return await _context.Meetups/*.Include(c=>c.Users)*/.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
+            }
+            catch 
+            {
+                return null;
+            }
+        }
+
         public IQueryable<Meetup> GetList(string searchQuery, SortState sortState, bool isDescending = false)
         {
-            IQueryable<Meetup> meetups = _context.Meetups.Include(c=>c.User);
+            IQueryable<Meetup> meetups = _context.Meetups;
             if (isDescending == false)
             {
                 switch (sortState)
@@ -35,18 +63,12 @@ namespace ConnectUs.Infrastructure.Repositories
                     case SortState.MeetupDate:
                         meetups.OrderBy(c => c.MeetupDate);
                         break;
-                    case SortState.AuthorName:
-                        meetups.OrderBy(c => c.User.UserName);
-                        if (!string.IsNullOrEmpty(searchQuery))
-                        {
-                            meetups.Where(c => c.User.UserName.Contains(searchQuery));
-                        }
-                        break;
+
                     default:
                         meetups.OrderBy(c => c.Title);
                         break;
                 }
-                
+
             }
             if (isDescending == true)
             {
@@ -62,13 +84,7 @@ namespace ConnectUs.Infrastructure.Repositories
                     case SortState.MeetupDate:
                         meetups.OrderByDescending(c => c.MeetupDate);
                         break;
-                    case SortState.AuthorName:
-                        meetups.OrderByDescending(c => c.User.UserName);
-                        if (!string.IsNullOrEmpty(searchQuery))
-                        {
-                            meetups.Where(c => c.User.UserName.Contains(searchQuery));
-                        }
-                        break;
+
                     default:
                         meetups.OrderBy(c => c.Title);
                         break;

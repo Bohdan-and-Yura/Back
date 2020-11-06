@@ -46,15 +46,15 @@ namespace ConnectUs
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddAutoMapper(typeof(AutoMapperProfile));
-            
+
             var mapperConfig = new MapperConfiguration(mc =>
             {
-                
+
                 mc.AddProfile(new AutoMapperProfile());
             });
-            
+
             IMapper mapper = mapperConfig.CreateMapper();
-            
+
             services.AddSingleton(mapper);
 
             #endregion
@@ -80,22 +80,23 @@ namespace ConnectUs
                     //ValidateLifetime = false,
                 };
             });
-
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IMeetupService, MeetupService>();
-            services.AddScoped<IUserService, UserService>();
-
             services.AddDbContext<BaseDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+         
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IMeetupService, MeetupService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUsersMeetupService, UsersMeetupService>();
+
             services.AddIdentity<User, IdentityRole>()
-                   .AddEntityFrameworkStores<BaseDbContext>()
+                    .AddEntityFrameworkStores<BaseDbContext>()
                     .AddDefaultTokenProviders();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
             services.AddMemoryCache();
             services.AddControllers();
-
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

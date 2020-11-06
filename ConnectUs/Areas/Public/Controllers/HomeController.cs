@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.DTO.PageResponseDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
@@ -24,10 +26,16 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     public class HomeController : ControllerBase
     {
         private readonly IMeetupService _meetup;
+        private readonly IUserService _userService;
+        private readonly IUsersMeetupService _usersMeetupService;
+        private readonly IMapper _mapper;
 
-        public HomeController(IMeetupService meetupService)
+        public HomeController(IMeetupService meetupService, IUserService userService, IUsersMeetupService usersMeetupService, IMapper mapper)
         {
             _meetup = meetupService;
+            _userService = userService;
+            _usersMeetupService = usersMeetupService;
+            _mapper = mapper;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -47,6 +55,30 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             };
             return new ResponseModel<HomeIndexResponse>(result);
 
+        }
+
+        /// <summary>
+        /// onClick btnJoin
+        /// </summary>
+        /// <param name="attenderId">from cookie</param>
+        /// <param name="meetupId">from query</param>
+        /// <returns></returns>
+        [HttpPost("join")]
+        //[Authorize]//authme
+        public async Task<IActionResult> JoinMeetup([FromQuery] string attenderId, string meetupId)
+        {
+            var user = await _userService.GetByIdAsync(attenderId);
+            if (user == null)
+            {
+                return NotFound(new ResponseModel<User>("User not found"));
+            }
+            var meetup = await _meetup.GetByIdAsync(meetupId);
+            if (meetup == null)
+                return NotFound(new ResponseModel<Meetup>("Meetup not found"));
+
+            await _meetup.AddUserToMeetup_AddMeetupToUserAsync(meetup, user);
+
+            return Ok(new ResponseModel<MeetupUser>());
         }
     }
 }

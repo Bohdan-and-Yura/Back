@@ -21,7 +21,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<bool> Delete(string id)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == id);
+            var user = _context.Users.FirstOrDefault(x => x.Id == (id));
             if (user == null)
                 return false;
             _context.Users.Remove(user);
@@ -34,12 +34,12 @@ namespace ConnectUs.Infrastructure.Repositories
             return _context.Users.ToList();
         }
 
-        public User GetById(string id)
+        public async Task<User> GetByIdAsync(string id)
         {
-            var user = _context.Users.Include(c=>c.Meetups).FirstOrDefault(x => x.Id == id);
+            var user = await _context.Users/*.Include(c => c.Meetups)*/.FirstOrDefaultAsync(x => x.Id == id);
             return user.WithoutPassword();
         }
 
-       
+
     }
 }

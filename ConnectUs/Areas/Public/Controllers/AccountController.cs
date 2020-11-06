@@ -113,7 +113,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            // удаляем аутентификационные куки  
+            // also delete authenticated  cookie  
             await _signInManager.SignOutAsync();
             return Accepted((new ResponseModel<LoginResponseDTO>()));
         }

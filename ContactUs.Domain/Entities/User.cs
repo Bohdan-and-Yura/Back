@@ -21,6 +21,6 @@ namespace ConnectUs.Domain.Entities
         public byte[] PasswordHashByte { get; set; }
         public byte[] PasswordSaltByte { get; set; }
 
-        public List<Meetup> Meetups { get; set; }
+        public ICollection<MeetupUser> Meetups { get; set; }
     }
 }

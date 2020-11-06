@@ -9,17 +9,30 @@ namespace ConnectUs.Infrastructure
 {
     public class BaseDbContext : IdentityDbContext
     {
-        public BaseDbContext(DbContextOptions<BaseDbContext> options) : base (options)
+        public BaseDbContext(DbContextOptions<BaseDbContext> options) : base(options)
         {
 
         }
-        public DbSet<User> Users { get; set; } 
-        public DbSet<Meetup> Meetups { get; set; } 
+        public DbSet<User> Users { get; set; }
+        public DbSet<Meetup> Meetups { get; set; }
+        public DbSet<MeetupUser> MeetupsUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
 
-            
+            builder.Entity<MeetupUser>()
+                 .HasKey(bc => new { bc.UserId, bc.MeetupId });
+
+            builder.Entity<MeetupUser>()
+                .HasOne(bc => bc.User)
+                .WithMany(b => b.Meetups)
+                .HasForeignKey(bc => bc.UserId);
+
+            builder.Entity<MeetupUser>()
+                .HasOne(bc => bc.Meetup)
+                .WithMany(c => c.Users)
+                .HasForeignKey(bc => bc.MeetupId);
+
+            base.OnModelCreating(builder);
         }
     }
 }

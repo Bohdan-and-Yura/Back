@@ -7,3 +7,4 @@
 /.vs
 /ConnectUs.Infrastructure/obj
 /ConnectUs.Infrastructure/bin
+/ConnectUs.Infrastructure/Migrations

@@ -40,10 +40,10 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
 
         [HttpGet("{id}")]
-        public ActionResult<ResponseModel<UserDTO>> GetById([FromQuery] string id)
+        public ActionResult<ResponseModel<UserDTO>> GetById(string id)
         {
             // only allow admins to access other user records
-            var user = _userService.GetById(id);
+            var user = _userService.GetByIdAsync(id);
             if (user == null)
                 return NotFound(new ResponseModel<UserDTO>("User not found"));
 

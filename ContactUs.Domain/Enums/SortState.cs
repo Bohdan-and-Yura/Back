@@ -6,9 +6,7 @@ namespace ConnectUs.Domain.Enums
 {
     public enum  SortState
     {
-        None,
         Title,
         MeetupDate,
-        AuthorName
     }
 }
