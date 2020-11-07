@@ -24,6 +24,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Cors;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.CookiePolicy;
 
 namespace ConnectUs
 {
@@ -54,49 +56,69 @@ namespace ConnectUs
             });
 
             IMapper mapper = mapperConfig.CreateMapper();
-
             services.AddSingleton(mapper);
 
             #endregion
 
-            // var appSettingsSection = Configuration.GetSection("AppSettings");
-            //services.Configure<AuthOptions>(appSettingsSection);
-            AuthOptions authOptions = new AuthOptions();
+            #region cookies configure
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.HttpOnly = HttpOnlyPolicy.Always;
+                options.Secure = CookieSecurePolicy.Always;
+            });
+
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
+            }).AddCookie(options =>
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                options.LoginPath = "/account/login";
+                options.LogoutPath = "/account/logout";
+                //options.Cookie.Expiration = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                options.Cookie.SameSite = SameSiteMode.None;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidIssuer = AuthOptions.ISSUER,
+
+                    ValidateAudience = true,
+                    ValidAudience = AuthOptions.AUDIENCE,
+                    ValidateLifetime = true,
+
                     IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                    //ValidateIssuer = false,
-                    ValidateAudience = false,
-                    //ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
                 };
             });
+
+            #endregion
             services.AddDbContext<BaseDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-         
-            services.AddScoped<IAccountService, AccountService>();
+            
+            services.AddTransient<IAccountService, AccountService>();
             services.AddScoped<IMeetupService, MeetupService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IUsersMeetupService, UsersMeetupService>();
+            services.AddScoped<IMeetupAdminService, MeetupAdminService>();
 
             services.AddIdentity<User, IdentityRole>()
                     .AddEntityFrameworkStores<BaseDbContext>()
                     .AddDefaultTokenProviders();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+
             services.AddMemoryCache();
             services.AddControllers();
-            
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

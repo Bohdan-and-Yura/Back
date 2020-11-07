@@ -14,9 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ConnectUs.Web.Areas.Admin.Controllers
 {
-    [Route("api/admin/meetup")]
+    [Route("api/admin/meetups")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = Role.Admin)]
+    [Authorize(Roles = Role.User)]
     public class MeetupController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -34,6 +35,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             {
 
                 var meetup = _mapper.Map<Meetup>(meetupDto);
+                meetup.CreatedByUser = HttpContext.User.Claims.FirstOrDefault().Value;
                 await _meetup.CreateAsync(meetup);
                 var response = _mapper.Map<MeetupResponseDTO>(meetup);
                 return Ok(new ResponseModel<MeetupResponseDTO>(response));
@@ -44,14 +46,23 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         [HttpDelete("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Delete(string meetupId)
         {
-            await _meetup.Delete(meetupId);
-            return Ok(new ResponseModel<MeetupResponseDTO>());
+            var user = HttpContext.User.Claims.ToList();
+
+            var result = await _meetup.Delete(meetupId, user);
+            if (result)
+            {
+                return Ok(new ResponseModel<MeetupResponseDTO>());
+            }
+            return (new ResponseModel<MeetupResponseDTO>("Forbidden"));
+            return Forbid();
         }
 
         [HttpGet]
-        public ActionResult<ResponseModel<IEnumerable<MeetupResponseDTO>>> GetList(string userId)
+        public ActionResult<ResponseModel<IEnumerable<MeetupResponseDTO>>> GetList()
         {
-            var meetups = _meetup.GetMeetups(userId);
+            var user = HttpContext.User.Claims.ToList();
+
+            var meetups = _meetup.GetMeetups(user);
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             return (new ResponseModel<IEnumerable<MeetupResponseDTO>>(result));
         }
@@ -60,14 +71,27 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         {
             var meetup = _mapper.Map<Meetup>(meetupUpdateDTO);
             meetup.Id = Guid.Parse(meetupId);
-            await _meetup.Update(meetup);
-            return (new ResponseModel<MeetupUpdateDTO>(meetupUpdateDTO));
+            var user = HttpContext.User.Claims.ToList();
+
+            var result = await _meetup.Update(meetup, user);
+            if (result)
+            {
+                return Ok(new ResponseModel<MeetupUpdateDTO>(meetupUpdateDTO));
+            }
+            return Forbid();
+
         }
 
         [HttpGet("{meetupId}")]
         public async Task<ActionResult<Meetup>> Fetch(string meetupId)
         {
-            return _meetup.GetById(meetupId);
+            var user = HttpContext.User.Claims.ToList();
+
+            var meetup= _meetup.GetById(meetupId, user);
+            var result = _mapper.Map<MeetupResponseDTO>(meetup);
+            return Ok(new ResponseModel<MeetupResponseDTO>(result));
+
+
         }
 
     }

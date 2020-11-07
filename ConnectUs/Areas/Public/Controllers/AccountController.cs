@@ -30,6 +30,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     /// </summary>
     [Route("api/account")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService account;
@@ -60,7 +61,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 var result = await account.CreateAsync(user);
                 if (result != null)
                 {
-                    // установка куки
+                    // cookie
                     await _signInManager.SignInAsync(user, false);
 
                     return Ok(new ResponseModel<RegisterDTO>());
@@ -86,54 +87,61 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 return BadRequest(new ResponseModel<LoginRequestDTO>("Username or password is incorrect", model));
 
 
-            var Subject = new List<Claim>
-               {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role)
-               };
-            var claimsIdentity = new ClaimsIdentity(Subject, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties();
-
+            var responseData = await TokenAuthenticate(user);
+            // returns basic user info and authentication token
+            return Ok(new ResponseModel<LoginResponseDTO>(responseData));
+        }
+        private async Task<LoginResponseDTO> TokenAuthenticate(User user)
+        {
             var jwt = new JwtSecurityToken(
                      issuer: AuthOptions.ISSUER,
                      audience: AuthOptions.AUDIENCE,
                      notBefore: DateTime.UtcNow,
-                     claims: Subject,
                      expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
                      signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("access_token", tokenString)
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+
             await HttpContext.SignInAsync(
                CookieAuthenticationDefaults.AuthenticationScheme,
-               new ClaimsPrincipal(claimsIdentity),
-               authProperties);
-            var responseData = new LoginResponseDTO
+               new ClaimsPrincipal(claimsIdentity));
+
+            return new LoginResponseDTO
             {
                 Id = user.Id,
                 Username = user.UserName,
                 Token = tokenString
             };
-            // returns basic user info and authentication token
-            return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
+
         [HttpPost("logout")]
         [ValidateAntiForgeryToken]
         [Authorize]
-
         public async Task<IActionResult> Logout()
         {
             // also delete authenticated  cookie  
-            await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Accepted((new ResponseModel<LoginResponseDTO>()));
         }
 
         [HttpPut("{id}")]
-        [Authorize]
-        public async Task<ActionResult<EditUserDTO>> Edit(string id, [FromBody] EditUserDTO model)
+        public async Task<ActionResult<EditUserDTO>> EditAccount( [FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
             {
-
-                var result = await account.UpdateAsync(id, model);
+                var userId=HttpContext.User.Claims.FirstOrDefault();
+                var result = await account.UpdateAsync(userId.Value, model);
                 if (result != null)
                 {
                     return Ok(new ResponseModel<EditUserDTO>(model));
@@ -147,11 +155,12 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
         }
 
-        [HttpDelete("{id}")]
-        [Authorize]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAccount()
         {
-            await account.DeleteAsync(id);
+            var userId = HttpContext.User.Claims.FirstOrDefault();
+
+            await account.DeleteAsync(userId.Value);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
 

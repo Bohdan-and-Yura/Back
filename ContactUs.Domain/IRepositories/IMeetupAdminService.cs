@@ -1,6 +1,7 @@
 ﻿using ConnectUs.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,9 +10,9 @@ namespace ConnectUs.Domain.IRepositories
     public interface IMeetupAdminService
     {
         Task CreateAsync(Meetup meetup);
-        Task Delete(string meetupId);
-        IEnumerable<Meetup> GetMeetups(string userId);
-        Task Update(Meetup meetup);
-        Meetup GetById(string meetupId);
+        Task<bool> Delete(string meetupId, List<Claim> user);
+        IEnumerable<Meetup> GetMeetups(List<Claim> user);
+        Task<bool> Update(Meetup meetup, List<Claim> user);
+        Meetup GetById(string meetupId, List<Claim> user);
     }
 }

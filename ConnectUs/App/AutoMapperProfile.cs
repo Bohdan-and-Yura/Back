@@ -26,9 +26,9 @@ namespace ConnectUs.Web.App
         }
         protected void MeetupAdminModels()
         {
-            CreateMap<CreateMeetupDTO, Meetup>();
+            CreateMap<CreateMeetupDTO, Meetup>(MemberList.None);
             CreateMap<Meetup, MeetupResponseDTO>();
-            CreateMap<MeetupUpdateDTO, Meetup>();
+            CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
         }
         protected void UserModels()
         {
