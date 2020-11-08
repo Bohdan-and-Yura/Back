@@ -13,6 +13,15 @@ namespace ConnectUs
     {
         public static void Main(string[] args)
         {
+        //    var host = new WebHostBuilder()
+        //    .UseKestrel()
+        //    .UseContentRoot(Directory.GetCurrentDirectory())
+        //    .UseIISIntegration()
+        //    .UseStartup()
+        //    .Build();
+
+        //    host.Run();
+
             CreateHostBuilder(args).Build().Run();
         }
 

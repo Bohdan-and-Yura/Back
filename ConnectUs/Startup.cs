@@ -26,6 +26,7 @@ using Microsoft.AspNetCore.Mvc.Cors;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace ConnectUs
 {
@@ -44,6 +45,7 @@ namespace ConnectUs
 
             services.AddCors();
 
+            services.AddSwaggerGen();
             #region automapper
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -69,6 +71,7 @@ namespace ConnectUs
                 options.Secure = CookieSecurePolicy.Always;
             });
 
+            
 
             services.AddAuthentication(x =>
             {
@@ -126,6 +129,14 @@ namespace ConnectUs
         {
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseSwagger(c =>
+            {
+                c.SerializeAsV2 = true;
+            }); app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
 
             if (env.IsDevelopment())
             {
@@ -142,7 +153,10 @@ namespace ConnectUs
                .SetIsOriginAllowed(origin => true) // allow any origin
                .AllowCredentials()
                ); //
-
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.All
+            });
             // custom jwt auth middleware
 
 

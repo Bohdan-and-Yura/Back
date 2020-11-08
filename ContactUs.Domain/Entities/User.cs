@@ -12,6 +12,7 @@ namespace ConnectUs.Domain.Entities
         public string Role { get; set; }
         public string Description { get; set; }
         public string Token { get; set; }
+        public string UserImgPath { get; set; }
         public DateTime BirthDay { get; set; }
 
         public string Password { get; set; }

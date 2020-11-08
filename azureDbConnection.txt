@@ -1,0 +1,1 @@
+Data Source=tcp:connectuswebdbserver.database.windows.net,1433;Initial Catalog=ConnectUs.Web_db;User Id=@connectuswebdbserver;Password=

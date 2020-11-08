@@ -1,0 +1,65 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dbserver_connectuswebdbserver_name": {
+      "type": "string"
+    },
+    "dbserver_connectuswebdbserver_adminlogin": {
+      "type": "string"
+    },
+    "dbserver_connectuswebdbserver_adminpassword": {
+      "type": "securestring"
+    },
+    "dbserver_connectuswebdbserver_location": {
+      "type": "string"
+    },
+    "dbserver_connectuswebdbserver_ConnectUs.Web_db_name": {
+      "type": "string"
+    },
+    "dbserver_connectuswebdbserver_ConnectUs.Web_db_location": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "location": "[parameters('dbserver_connectuswebdbserver_location')]",
+      "name": "[parameters('dbserver_connectuswebdbserver_name')]",
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2014-04-01-preview",
+      "properties": {
+        "administratorLogin": "[parameters('dbserver_connectuswebdbserver_adminlogin')]",
+        "administratorLoginPassword": "[parameters('dbserver_connectuswebdbserver_adminpassword')]"
+      },
+      "resources": [
+        {
+          "location": "[parameters('dbserver_connectuswebdbserver_location')]",
+          "name": "AllowAllAzureIPs",
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('dbserver_connectuswebdbserver_name'))]"
+          ],
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "location": "[parameters('dbserver_connectuswebdbserver_ConnectUs.Web_db_location')]",
+          "name": "[parameters('dbserver_connectuswebdbserver_ConnectUs.Web_db_name')]",
+          "type": "databases",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('dbserver_connectuswebdbserver_name'))]"
+          ],
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "edition": "Standard",
+            "maxSizeBytes": "1073741824"
+          }
+        }
+      ]
+    }
+  ]
+}

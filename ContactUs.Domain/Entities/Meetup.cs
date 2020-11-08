@@ -11,6 +11,7 @@ namespace ConnectUs.Domain.Entities
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        public string MeetupImgPath { get; set; }
         public DateTime MeetupDate { get; set; }
         public string City { get; set; }
         public string CreatedByUser { get; set; }
