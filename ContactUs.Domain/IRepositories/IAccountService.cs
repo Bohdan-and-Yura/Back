@@ -15,6 +15,6 @@ namespace ConnectUs.Domain.IRepositories
         Task<User> CreateAsync(User registerDTO);
         Task<EditUserDTO> UpdateAsync(string id, EditUserDTO user);
         Task DeleteAsync(string id);
-        Task<User> GetUserById(string id);
+        Task<User> GetUserById(string? id);
     }
 }

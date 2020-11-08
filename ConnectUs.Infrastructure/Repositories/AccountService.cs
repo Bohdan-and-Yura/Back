@@ -31,8 +31,12 @@ namespace ConnectUs.Infrastructure.Repositories
             return _context.Users.FirstOrDefault(c => c.Email.ToLower() == userName.ToLower());
 
         }
-        public async Task<User> GetUserById(string id)
+        public async Task<User> GetUserById(string? id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
             return await _context.Users.Include(c => c.Meetups).FirstOrDefaultAsync(c => c.Id == id);
 
         }
@@ -40,7 +44,7 @@ namespace ConnectUs.Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
-            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+            var user = _context.Users.Include(c=>c.Meetups).SingleOrDefault(x => x.Email == email);
 
             // check if userexists
             if (user == null)

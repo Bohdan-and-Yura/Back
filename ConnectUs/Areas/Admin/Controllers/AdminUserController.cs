@@ -31,21 +31,21 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = Role.Admin)]
 
-        public ActionResult<ResponseModel<User>> DeleteById(string id)
+        public ActionResult<ResponseModel<UserDTO>> DeleteById(string id)
         {
 
             // only allow admins to access other user records
             var result = _userService.Delete(id);
             if (result.Result == false)
             {
-                return BadRequest(new ResponseModel<User>("user not found"));
+                return BadRequest(new ResponseModel<UserDTO>("user not found"));
             }
-            return Ok(new ResponseModel<User>());
+            return Ok(new ResponseModel<UserDTO>());
         }
         [HttpGet]
         [Authorize(Roles = Role.Admin)]
 
-        public ActionResult<ResponseModel<IEnumerable<User>>> GetAll()
+        public ActionResult<ResponseModel<IEnumerable<UserListDTO>>> GetAll()
         {
             var users = _userService.GetAll();
             var result = _mapper.Map<IEnumerable<UserListDTO>>(users);

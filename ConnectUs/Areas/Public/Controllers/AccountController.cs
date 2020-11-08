@@ -30,16 +30,16 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     /// </summary>
     [Route("api/account")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountService account;
+        private readonly IAccountService _account;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
         public AccountController(IAccountService accountService, SignInManager<User> signInManager, ILogger<AccountController> logger, IMapper mapper)
         {
-            account = accountService;
+            _account = accountService;
             _signInManager = signInManager;
             _logger = logger;
             _mapper = mapper;
@@ -58,7 +58,8 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
                 var user = _mapper.Map<User>(registerDTO);
                 user.Role = Role.User;
-                var result = await account.CreateAsync(user);
+                user.BirthDay= Convert.ToDateTime(user.BirthDay.ToShortDateString());
+                var result = await _account.CreateAsync(user);
                 if (result != null)
                 {
                     // cookie
@@ -76,18 +77,39 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
 
         }
+        [HttpGet]
+        [AllowAnonymous]
 
+        public async Task<ActionResult<ResponseModel<UserDTO>>> MyAccount()
+        {
+            var userId = HttpContext.User.Claims.FirstOrDefault();
+            if (string.IsNullOrEmpty(userId?.Value))
+            {
+                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+            }
+
+            var user = await _account.GetUserById(userId?.Value ?? "");
+            var result = _mapper.Map<UserDTO>(user);
+            if (result == null)
+            {
+                return Ok(new ResponseModel<UserDTO>("User not found. Wrong id"));
+
+            }
+            return Ok(new ResponseModel<UserDTO>(result));
+        }
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO model)
         {
-            var user = account.Authenticate(model.Email, model.Password);
+            var user = _account.Authenticate(model.Email, model.Password);
 
             if (user == null)
                 return BadRequest(new ResponseModel<LoginRequestDTO>("Username or password is incorrect", model));
 
 
             var responseData = await TokenAuthenticate(user);
+
+            
             // returns basic user info and authentication token
             return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
@@ -125,7 +147,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             };
         }
 
-        [HttpPost("logout")]
+        [HttpGet("logout")]
         [ValidateAntiForgeryToken]
         [Authorize]
         public async Task<IActionResult> Logout()
@@ -135,15 +157,18 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             return Accepted((new ResponseModel<LoginResponseDTO>()));
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         [Authorize]
-
-        public async Task<ActionResult<EditUserDTO>> EditAccount( [FromBody] EditUserDTO model)
+        public async Task<ActionResult<EditUserDTO>> EditAccount([FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
             {
-                var userId=HttpContext.User.Claims.FirstOrDefault();
-                var result = await account.UpdateAsync(userId.Value, model);
+                var userId = HttpContext.User.Claims.FirstOrDefault();
+                if (string.IsNullOrEmpty(userId?.Value))
+                {
+                    return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+                }
+                var result = await _account.UpdateAsync(userId.Value, model);
                 if (result != null)
                 {
                     return Ok(new ResponseModel<EditUserDTO>(model));
@@ -159,14 +184,17 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         [HttpDelete]
         [Authorize]
-
         public async Task<IActionResult> DeleteAccount()
         {
             var userId = HttpContext.User.Claims.FirstOrDefault();
-
-            await account.DeleteAsync(userId.Value);
+            if (string.IsNullOrEmpty(userId?.Value))
+            {
+                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+            }
+            await _account.DeleteAsync(userId.Value);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
 
+       
     }
 }

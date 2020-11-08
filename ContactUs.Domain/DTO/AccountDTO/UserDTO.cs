@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConnectUs.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,6 +12,6 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         public string UserName { get; set; }
         public string UserImgPath { get; set; }
         public DateTime BirthDay { get; set; }
-        public List<ConnectUs.Domain.Entities.Meetup> Meetups { get; set; }
+
     }
 }

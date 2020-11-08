@@ -11,7 +11,7 @@ namespace ConnectUs.Domain.IRepositories
 {
     public interface IMeetupService
     {
-        IQueryable<Meetup> GetList(string searchQuery, SortState sortState,bool isDescending=false);
+        Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState,bool isDescending=false);
         Task<Meetup> GetByIdAsync(string meetupId);
         Task AddUserToMeetup_AddMeetupToUserAsync(Meetup meetup, User user);
     }

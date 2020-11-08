@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.DTO.PageResponseDTO;
 using ConnectUs.Domain.Entities;
@@ -41,8 +42,8 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         {
             int pageSize = 18;
 
-            List<Meetup> meetups = await _meetup.GetList(searchQuery, sortState, isDescending).AsNoTracking().ToListAsync();
-
+            var meetups = await _meetup.GetList(searchQuery, sortState, isDescending);
+            
             PageViewModel pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
             var items = meetups.Skip(page - 1).Take(meetupsCount);
 
@@ -63,9 +64,14 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [HttpPost("join")]
         [Authorize]//authme
-        public async Task<IActionResult> JoinMeetup([FromQuery] string attenderId, string meetupId)
+        public async Task<IActionResult> JoinMeetup([FromQuery] string meetupId)
         {
-            var user = await _userService.GetByIdAsync(attenderId);
+            var userId = HttpContext.User.Claims.FirstOrDefault();
+            if (string.IsNullOrEmpty(userId?.Value))
+            {
+                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+            }
+            var user = await _userService.GetByIdAsync(userId.Value);
             if (user == null)
             {
                 return NotFound(new ResponseModel<User>("User not found"));

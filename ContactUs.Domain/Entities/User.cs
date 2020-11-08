@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Dynamic;
+using System.Globalization;
 using System.Text;
 
 namespace ConnectUs.Domain.Entities
@@ -22,6 +23,6 @@ namespace ConnectUs.Domain.Entities
         public byte[] PasswordHashByte { get; set; }
         public byte[] PasswordSaltByte { get; set; }
 
-        public ICollection<MeetupUser> Meetups { get; set; }
+        public List<MeetupUser> Meetups { get; set; }
     }
 }

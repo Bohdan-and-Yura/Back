@@ -31,7 +31,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public IEnumerable<User> GetAll()
         {
-            return _context.Users.Include(c=>c.Meetups).ToList();
+            return _context.Users.ToList();
         }
 
         public async Task<User> GetByIdAsync(string id)

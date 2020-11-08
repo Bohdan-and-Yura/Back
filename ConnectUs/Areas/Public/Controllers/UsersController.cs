@@ -31,7 +31,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public ActionResult<ResponseModel<IEnumerable<User>>> GetAll()
+        public ActionResult<ResponseModel<IEnumerable<UserListDTO>>> GetAll()
         {
             var users = _userService.GetAll();
             var result = _mapper.Map<IEnumerable<UserListDTO>>(users);

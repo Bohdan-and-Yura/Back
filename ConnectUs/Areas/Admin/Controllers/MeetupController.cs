@@ -29,6 +29,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             _meetup = meetup;
         }
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Create([FromBody] CreateMeetupDTO meetupDto)
         {
             if (ModelState.IsValid)
@@ -43,6 +44,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             return BadRequest(new ResponseModel<CreateMeetupDTO>("Create failed", meetupDto));
 
         }
+        [Authorize]
         [HttpDelete("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Delete(string meetupId)
         {
@@ -54,9 +56,10 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
                 return Ok(new ResponseModel<MeetupResponseDTO>());
             }
             return (new ResponseModel<MeetupResponseDTO>("Forbidden"));
-            return Forbid();
+            //return Forbid();
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult<ResponseModel<IEnumerable<MeetupResponseDTO>>> GetList()
         {
@@ -66,6 +69,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             return (new ResponseModel<IEnumerable<MeetupResponseDTO>>(result));
         }
+        [Authorize]
         [HttpPut("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupUpdateDTO>>> Update(string meetupId, [FromBody] MeetupUpdateDTO meetupUpdateDTO)
         {
@@ -82,12 +86,13 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
         }
 
+        [Authorize]
         [HttpGet("{meetupId}")]
-        public async Task<ActionResult<Meetup>> Fetch(string meetupId)
+        public async Task<ActionResult<MeetupResponseDTO>> Fetch(string meetupId)
         {
             var user = HttpContext.User.Claims.ToList();
 
-            var meetup= _meetup.GetById(meetupId, user);
+            var meetup= await _meetup.GetById(meetupId, user);
             var result = _mapper.Map<MeetupResponseDTO>(meetup);
             return Ok(new ResponseModel<MeetupResponseDTO>(result));
 

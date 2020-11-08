@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
@@ -16,10 +17,12 @@ namespace ConnectUs.Infrastructure.Repositories
     public class MeetupService : IMeetupService
     {
         private readonly BaseDbContext _context;
+        private readonly IMapper _mapper;
 
-        public MeetupService(BaseDbContext baseDbContext)
+        public MeetupService(BaseDbContext baseDbContext, IMapper mapper)
         {
             _context = baseDbContext;
+            _mapper = mapper;
         }
 
         public async Task AddUserToMeetup_AddMeetupToUserAsync(Meetup meetup, User user)
@@ -46,32 +49,33 @@ namespace ConnectUs.Infrastructure.Repositories
             }
         }
 
-        public IQueryable<Meetup> GetList(string searchQuery, SortState sortState, bool isDescending = false)
+        public async Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState, bool isDescending = false)
         {
-            IQueryable<Meetup> meetups = _context.Meetups;
+            var meetups = await _context.Meetups.ToListAsync();
+            var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             if (isDescending == false)
             {
                 switch (sortState)
                 {
                     case SortState.Title:
-                        meetups.OrderBy(c => c.Title);
+                        result.OrderBy(c => c.Title);
                         if (!string.IsNullOrEmpty(searchQuery))
                         {
-                            meetups.Where(c => c.Title.Contains(searchQuery));
+                            result.Where(c => c.Title.Contains(searchQuery));
                         }
                         break;
                     case SortState.MeetupDate:
-                        meetups.OrderBy(c => c.MeetupDate);
+                        result.OrderBy(c => c.MeetupDate);
                         break;
                     case SortState.City:
-                        meetups.OrderBy(c => c.City);
+                        result.OrderBy(c => c.City);
                         if (!string.IsNullOrEmpty(searchQuery))
                         {
-                            meetups.Where(c => c.City.Contains(searchQuery));
+                            result.Where(c => c.City.Contains(searchQuery));
                         }
                         break;
                     default:
-                        meetups.OrderBy(c => c.Title);
+                        result.OrderBy(c => c.Title);
                         break;
                 }
 
@@ -81,28 +85,29 @@ namespace ConnectUs.Infrastructure.Repositories
                 switch (sortState)
                 {
                     case SortState.Title:
-                        meetups.OrderByDescending(c => c.Title);
+                        result.OrderByDescending(c => c.Title);
                         if (!string.IsNullOrEmpty(searchQuery))
                         {
-                            meetups.Where(c => c.Title.Contains(searchQuery));
+                            result.Where(c => c.Title.Contains(searchQuery));
                         }
                         break;
                     case SortState.MeetupDate:
-                        meetups.OrderByDescending(c => c.MeetupDate);
+                        result.OrderByDescending(c => c.MeetupDate);
                         break;
                     case SortState.City:
-                        meetups.OrderByDescending(c => c.City);
+                        result.OrderByDescending(c => c.City);
                         if (!string.IsNullOrEmpty(searchQuery))
                         {
-                            meetups.Where(c => c.City.Contains(searchQuery));
+                            result.Where(c => c.City.Contains(searchQuery));
                         }
                         break;
                     default:
-                        meetups.OrderBy(c => c.Title);
+                        result.OrderBy(c => c.Title);
                         break;
                 }
             }
-            return meetups;
+            
+            return result;
         }
     }
 }
