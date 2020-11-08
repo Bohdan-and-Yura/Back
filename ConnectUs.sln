@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectUs.Web", "ConnectUs\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectUs.Domain", "ContactUs.Domain\ConnectUs.Domain.csproj", "{DEB1978A-236E-4E65-B515-5AF7BEDD8CCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnectUs.Infrastructure", "ConnectUs.Infrastructure\ConnectUs.Infrastructure.csproj", "{70C0AFEF-F7C8-490B-B7E8-901D7227F7B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectUs.Infrastructure", "ConnectUs.Infrastructure\ConnectUs.Infrastructure.csproj", "{70C0AFEF-F7C8-490B-B7E8-901D7227F7B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -29,6 +29,8 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             _mapper = mapper;
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = Role.Admin)]
+
         public ActionResult<ResponseModel<User>> DeleteById(string id)
         {
 

@@ -62,7 +62,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <param name="meetupId">from query</param>
         /// <returns></returns>
         [HttpPost("join")]
-        //[Authorize]//authme
+        [Authorize]//authme
         public async Task<IActionResult> JoinMeetup([FromQuery] string attenderId, string meetupId)
         {
             var user = await _userService.GetByIdAsync(attenderId);

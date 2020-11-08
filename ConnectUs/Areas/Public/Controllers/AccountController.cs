@@ -136,6 +136,8 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
+
         public async Task<ActionResult<EditUserDTO>> EditAccount( [FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
@@ -156,6 +158,8 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
+
         public async Task<IActionResult> DeleteAccount()
         {
             var userId = HttpContext.User.Claims.FirstOrDefault();

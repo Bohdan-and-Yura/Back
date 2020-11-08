@@ -1,4 +1,5 @@
-﻿using ConnectUs.Domain.DTO.AccountDTO;
+﻿using AutoMapper;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories;
@@ -18,10 +19,12 @@ namespace ConnectUs.Infrastructure.Repositories
     public class AccountService : IAccountService
     {
         private readonly BaseDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AccountService(BaseDbContext baseDbContext)
+        public AccountService(BaseDbContext baseDbContext, IMapper mapper)
         {
             _context = baseDbContext;
+            _mapper = mapper;
         }
         public User GetUserByEmail(string userName)
         {
@@ -101,9 +104,8 @@ namespace ConnectUs.Infrastructure.Repositories
             User user = await GetUserById(id);
             if (user != null)
             {
-                user.BirthDay = editModel.BirthDay;
-                user.UserName = editModel.UserName;
-                _context.Users.Update(user);
+                var result =_mapper.Map<User>(editModel);
+                _context.Users.Update(result);
                 await _context.SaveChangesAsync();
                 return editModel;
             }

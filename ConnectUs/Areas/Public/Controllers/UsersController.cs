@@ -52,7 +52,6 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         }
 
 
-        //does administrator can create or update user??
 
     }
 }

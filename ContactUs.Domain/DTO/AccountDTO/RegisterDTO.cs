@@ -21,7 +21,6 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
-        public string UserImgPath { get; set; }
 
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
