@@ -48,8 +48,8 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         public ActionResult<ResponseModel<IEnumerable<User>>> GetAll()
         {
             var users = _userService.GetAll();
-            var result = _mapper.Map<IEnumerable<UserDTO>>(users);
-            return Ok(new ResponseModel<IEnumerable<UserDTO>>(result));
+            var result = _mapper.Map<IEnumerable<UserListDTO>>(users);
+            return Ok(new ResponseModel<IEnumerable<UserListDTO>>(result));
         }
     }
 }
