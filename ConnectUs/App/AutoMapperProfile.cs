@@ -32,8 +32,9 @@ namespace ConnectUs.Web.App
         }
         protected void UserModels()
         {
-            CreateMap<User, UserDTO>(MemberList.None).ForMember(c=>c.Id,o=>o.MapFrom(c=>c.Id));
+            CreateMap<User, UserDataDTO>(MemberList.None).ForMember(c=>c.Id,o=>o.MapFrom(c=>c.Id));
             CreateMap<User, UserListDTO>(MemberList.None);
+            CreateMap<User, UserMeetupsDTO>(MemberList.None);
             CreateMap<EditUserDTO, User>(MemberList.None);
 
             CreateMap<RegisterDTO, User>(MemberList.None);

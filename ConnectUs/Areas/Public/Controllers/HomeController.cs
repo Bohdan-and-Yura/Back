@@ -69,7 +69,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             var userId = HttpContext.User.Claims.FirstOrDefault();
             if (string.IsNullOrEmpty(userId?.Value))
             {
-                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
             }
             var user = await _userService.GetByIdAsync(userId.Value);
             if (user == null)

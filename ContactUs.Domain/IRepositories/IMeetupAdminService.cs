@@ -13,6 +13,6 @@ namespace ConnectUs.Domain.IRepositories
         Task<bool> Delete(string meetupId, List<Claim> user);
         IEnumerable<Meetup> GetMeetups(List<Claim> user);
         Task<bool> Update(Meetup meetup, List<Claim> user);
-        Task<Meetup> GetById(string meetupId, List<Claim> user);
+        Task<Meetup> GetById(string meetupId);
     }
 }

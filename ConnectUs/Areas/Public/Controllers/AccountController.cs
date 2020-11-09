@@ -45,7 +45,11 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             _mapper = mapper;
         }
 
-
+        /// <summary>
+        /// register
+        /// </summary>
+        /// <param name="registerDTO"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<RegisterDTO>> Register([FromBody] RegisterDTO registerDTO)
@@ -77,26 +81,33 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
 
         }
+        /// <summary>
+        /// get my account
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [AllowAnonymous]
-
-        public async Task<ActionResult<ResponseModel<UserDTO>>> MyAccount()
+        public async Task<ActionResult<ResponseModel<UserDataDTO>>> MyAccount()
         {
             var userId = HttpContext.User.Claims.FirstOrDefault();
             if (string.IsNullOrEmpty(userId?.Value))
             {
-                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
             }
 
             var user = await _account.GetUserById(userId?.Value ?? "");
-            var result = _mapper.Map<UserDTO>(user);
+            var result = _mapper.Map<UserDataDTO>(user);
             if (result == null)
             {
-                return Ok(new ResponseModel<UserDTO>("User not found. Wrong id"));
+                return Ok(new ResponseModel<UserDataDTO>("User not found. Wrong id"));
 
             }
-            return Ok(new ResponseModel<UserDTO>(result));
+            return Ok(new ResponseModel<UserDataDTO>(result));
         }
+        /// <summary>
+        /// login
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO model)
@@ -146,7 +157,10 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 Token = tokenString
             };
         }
-
+        /// <summary>
+        /// logout
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("logout")]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -156,7 +170,11 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return Accepted((new ResponseModel<LoginResponseDTO>()));
         }
-
+        /// <summary>
+        /// update data account
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPut]
         [Authorize]
         public async Task<ActionResult<EditUserDTO>> EditAccount([FromBody] EditUserDTO model)
@@ -166,7 +184,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 var userId = HttpContext.User.Claims.FirstOrDefault();
                 if (string.IsNullOrEmpty(userId?.Value))
                 {
-                    return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+                    return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
                 }
                 var result = await _account.UpdateAsync(userId.Value, model);
                 if (result != null)
@@ -181,7 +199,10 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             }
             return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
         }
-
+        /// <summary>
+        /// delete account
+        /// </summary>
+        /// <returns></returns>
         [HttpDelete]
         [Authorize]
         public async Task<IActionResult> DeleteAccount()
@@ -189,12 +210,13 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             var userId = HttpContext.User.Claims.FirstOrDefault();
             if (string.IsNullOrEmpty(userId?.Value))
             {
-                return Unauthorized(new ResponseModel<UserDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
             }
             await _account.DeleteAsync(userId.Value);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
 
-       
+
+
     }
 }

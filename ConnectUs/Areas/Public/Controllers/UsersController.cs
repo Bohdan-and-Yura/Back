@@ -40,15 +40,15 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
 
         [HttpGet("{id}")]
-        public ActionResult<ResponseModel<UserDTO>> Fetch(string id)
+        public async Task<ActionResult<ResponseModel<UserMeetupsDTO>>> Fetch(string id)
         {
             // only allow admins to access other user records
-            var user = _userService.GetByIdAsync(id);
+            var user = await _userService.GetByIdAsync(id);
             if (user == null)
-                return NotFound(new ResponseModel<UserDTO>("User not found"));
+                return NotFound(new ResponseModel<UserMeetupsDTO>("User not found"));
 
-            var result = _mapper.Map<UserDTO>(user);
-            return Ok(new ResponseModel<UserDTO>(result));
+            var result = _mapper.Map<UserMeetupsDTO>(user);
+            return Ok(new ResponseModel<UserMeetupsDTO>(result));
         }
 
 

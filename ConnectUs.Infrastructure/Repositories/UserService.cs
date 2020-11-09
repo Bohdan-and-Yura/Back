@@ -36,7 +36,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<User> GetByIdAsync(string id)
         {
-            var user = await _context.Users/*.Include(c => c.Meetups)*/.FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.Include(c => c.Meetups).FirstOrDefaultAsync(x => x.Id == id);
             return user.WithoutPassword();
         }
 

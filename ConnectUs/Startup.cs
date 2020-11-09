@@ -105,6 +105,7 @@ namespace ConnectUs
             });
 
             #endregion
+
             services.AddDbContext<BaseDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

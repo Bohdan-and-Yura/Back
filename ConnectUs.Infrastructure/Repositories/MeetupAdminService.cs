@@ -40,7 +40,7 @@ namespace ConnectUs.Infrastructure.Repositories
             return false;
         }
 
-        public async Task<Meetup> GetById(string meetupId, List<Claim> user)
+        public async Task<Meetup> GetById(string meetupId)
         {
             return await _context.Meetups.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
         }
