@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ConnectUs.Domain.Entities
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class MeetupUser
     {
         public Guid MeetupId { get; set; }

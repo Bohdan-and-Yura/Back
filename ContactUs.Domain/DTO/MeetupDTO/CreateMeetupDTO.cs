@@ -21,7 +21,6 @@ namespace ConnectUs.Domain.DTO.MeetupDTO
         [Required]
         public string City { get; set; }
 
-        public string CreatedByUser { get; set; }
         public string MeetupImgPath { get; set; }
     }
 }

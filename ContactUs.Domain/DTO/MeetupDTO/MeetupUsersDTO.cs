@@ -5,15 +5,16 @@ using System.Text;
 
 namespace ConnectUs.Domain.DTO.MeetupDTO
 {
-    public class MeetupResponseDTO
+    public class MeetupUsersDTO
     {
-        public string Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime MeetupDate { get; set; }
         public string City { get; set; }
         public string MeetupImgPath { get; set; }
         public string CreatedByUser { get; set; }
+        public ICollection<UserDataDTO> UsersJoined { get; set; }
+
 
 
     }

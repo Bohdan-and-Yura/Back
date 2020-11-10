@@ -31,12 +31,12 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public IEnumerable<User> GetAll()
         {
-            return _context.Users.ToList();
+            return _context.Users.Include(c=>c.MeetupsJoined).ToList().Where(c=>c.MeetupsJoined.Count>0);
         }
 
         public async Task<User> GetByIdAsync(string id)
         {
-            var user = await _context.Users.Include(c => c.Meetups).FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _context.Users.Include(c => c.MeetupsJoined).FirstOrDefaultAsync(x => x.Id == id);
             return user.WithoutPassword();
         }
 

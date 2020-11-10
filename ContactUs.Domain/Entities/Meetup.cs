@@ -15,7 +15,8 @@ namespace ConnectUs.Domain.Entities
         public DateTime MeetupDate { get; set; }
         public string City { get; set; }
         public string CreatedByUser { get; set; }
-        public ICollection<MeetupUser> Users { get; set; }
+        public ICollection<MeetupUser> UsersJoined { get; set; }
+        public User UserCreator { get; set; }
         
     }
 }

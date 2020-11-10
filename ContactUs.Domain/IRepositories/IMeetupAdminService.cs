@@ -10,9 +10,10 @@ namespace ConnectUs.Domain.IRepositories
     public interface IMeetupAdminService
     {
         Task CreateAsync(Meetup meetup);
-        Task<bool> Delete(string meetupId, List<Claim> user);
-        IEnumerable<Meetup> GetMeetups(List<Claim> user);
-        Task<bool> Update(Meetup meetup, List<Claim> user);
+        Task<bool> Delete(string meetupId, string userId);
+        IEnumerable<Meetup> GetMeetups(string userId);
+        Task<bool> Update(Meetup meetup, string userId);
         Task<Meetup> GetById(string meetupId);
+        List<MeetupUser> GetJoinedMeetups(string userId);
     }
 }

@@ -28,6 +28,7 @@ namespace ConnectUs.Web.App
         {
             CreateMap<CreateMeetupDTO, Meetup>(MemberList.None);
             CreateMap<Meetup, MeetupResponseDTO>();
+            CreateMap<Meetup, MeetupUsersDTO>();
             CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
         }
         protected void UserModels()
@@ -36,6 +37,7 @@ namespace ConnectUs.Web.App
             CreateMap<User, UserListDTO>(MemberList.None);
             CreateMap<User, UserMeetupsDTO>(MemberList.None);
             CreateMap<EditUserDTO, User>(MemberList.None);
+            CreateMap<MeetupUser, UserDataDTO>(MemberList.None);
 
             CreateMap<RegisterDTO, User>(MemberList.None);
             //.ForMember(c => c.AccessFailedCount, o => o.Ignore())

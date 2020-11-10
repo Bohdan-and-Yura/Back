@@ -34,67 +34,33 @@ namespace ConnectUs.Web.Areas.Public.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _account;
-        private readonly SignInManager<User> _signInManager;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
-        public AccountController(IAccountService accountService, SignInManager<User> signInManager, ILogger<AccountController> logger, IMapper mapper)
+
+        public AccountController(IAccountService accountService, ILogger<AccountController> logger, IMapper mapper)
         {
             _account = accountService;
-            _signInManager = signInManager;
             _logger = logger;
             _mapper = mapper;
         }
 
         /// <summary>
-        /// register
-        /// </summary>
-        /// <param name="registerDTO"></param>
-        /// <returns></returns>
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<ActionResult<RegisterDTO>> Register([FromBody] RegisterDTO registerDTO)
-        {
-            if (ModelState.IsValid)
-            {
-                if (string.IsNullOrEmpty(registerDTO.Password))
-                    return BadRequest(new ResponseModel<RegisterDTO>("Passord cannot be empty", registerDTO));
-
-
-                var user = _mapper.Map<User>(registerDTO);
-                user.Role = Role.User;
-                user.BirthDay= Convert.ToDateTime(user.BirthDay.ToShortDateString());
-                var result = await _account.CreateAsync(user);
-                if (result != null)
-                {
-                    // cookie
-                    await _signInManager.SignInAsync(user, false);
-
-                    return Ok(new ResponseModel<RegisterDTO>());
-
-                }
-                else
-                {
-                    return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
-                }
-            }
-
-            return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
-
-        }
-        /// <summary>
         /// get my account
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("myAccount")]
+        //[Authorize]
         public async Task<ActionResult<ResponseModel<UserDataDTO>>> MyAccount()
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault();
-            if (string.IsNullOrEmpty(userId?.Value))
+            string userId = HttpContext.Request.Cookies["X-Username"];
+
+            var t = HttpContext.User;
+            if (string.IsNullOrEmpty(userId??""))
             {
-                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("Vasya, you are not loggined"));
             }
 
-            var user = await _account.GetUserById(userId?.Value ?? "");
+            var user = await _account.GetUserById(userId?? "");
             var result = _mapper.Map<UserDataDTO>(user);
             if (result == null)
             {
@@ -116,24 +82,21 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
             if (user == null)
                 return BadRequest(new ResponseModel<LoginRequestDTO>("Username or password is incorrect", model));
-
-
             var responseData = await TokenAuthenticate(user);
-
-            
             // returns basic user info and authentication token
             return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
         private async Task<LoginResponseDTO> TokenAuthenticate(User user)
         {
+            user.RefreshToken = Guid.NewGuid().ToString();
             var jwt = new JwtSecurityToken(
                      issuer: AuthOptions.ISSUER,
                      audience: AuthOptions.AUDIENCE,
                      notBefore: DateTime.UtcNow,
                      expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
                      signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
+
 
 
             var claims = new List<Claim>
@@ -142,14 +105,20 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("access_token", tokenString)
             };
-
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
+            var authProperties = new AuthenticationProperties()
+            {
+                IsPersistent = true
+            };
 
             await HttpContext.SignInAsync(
-               CookieAuthenticationDefaults.AuthenticationScheme,
-               new ClaimsPrincipal(claimsIdentity));
-
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+            
+            Response.Cookies.Append("X-Access-Token", tokenString, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
+            Response.Cookies.Append("X-Username", user.Id, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
+            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
             return new LoginResponseDTO
             {
                 Id = user.Id,
@@ -157,13 +126,49 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 Token = tokenString
             };
         }
+
+
+        /// <summary>
+        /// register
+        /// </summary>
+        /// <param name="registerDTO"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<ActionResult<RegisterDTO>> Register([FromBody] RegisterDTO registerDTO)
+        {
+            if (ModelState.IsValid)
+            {
+                if (string.IsNullOrEmpty(registerDTO.Password))
+                    return BadRequest(new ResponseModel<RegisterDTO>("Passord cannot be empty", registerDTO));
+
+
+                var user = _mapper.Map<User>(registerDTO);
+                user.Role = Role.User;
+                user.BirthDay = Convert.ToDateTime(user.BirthDay.ToShortDateString());
+                var result = await _account.CreateAsync(user);
+                if (result != null)
+                {
+                    // cookie
+                    return Ok(new ResponseModel<RegisterDTO>());
+
+                }
+                else
+                {
+                    return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
+                }
+            }
+
+            return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
+
+        }
         /// <summary>
         /// logout
         /// </summary>
         /// <returns></returns>
         [HttpGet("logout")]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Logout()
         {
             // also delete authenticated  cookie  
@@ -176,17 +181,17 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<EditUserDTO>> EditAccount([FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
             {
-                var userId = HttpContext.User.Claims.FirstOrDefault();
-                if (string.IsNullOrEmpty(userId?.Value))
+                string userId = HttpContext.Request.Cookies["X-Username"];
+                if (string.IsNullOrEmpty(userId))
                 {
                     return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
                 }
-                var result = await _account.UpdateAsync(userId.Value, model);
+                var result = await _account.UpdateAsync(userId, model);
                 if (result != null)
                 {
                     return Ok(new ResponseModel<EditUserDTO>(model));
@@ -204,15 +209,15 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> DeleteAccount()
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault();
-            if (string.IsNullOrEmpty(userId?.Value))
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
             }
-            await _account.DeleteAsync(userId.Value);
+            await _account.DeleteAsync(userId);
             return Accepted(new ResponseModel<EditUserDTO>());
         }
 

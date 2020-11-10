@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 
 namespace ConnectUs
 {
@@ -53,7 +54,6 @@ namespace ConnectUs
 
             var mapperConfig = new MapperConfiguration(mc =>
             {
-
                 mc.AddProfile(new AutoMapperProfile());
             });
 
@@ -63,33 +63,16 @@ namespace ConnectUs
             #endregion
 
             #region cookies configure
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.HttpOnly = HttpOnlyPolicy.Always;
-                options.Secure = CookieSecurePolicy.Always;
-            });
 
-            
-
-            services.AddAuthentication(x =>
+            services.AddAuthentication(o =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddCookie(options =>
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.LoginPath = "/account/login";
-                options.LogoutPath = "/account/logout";
-                //options.Cookie.Expiration = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                options.Cookie.SameSite = SameSiteMode.None;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
+                options.RequireHttpsMetadata = true;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -102,26 +85,41 @@ namespace ConnectUs
                     IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
                     ValidateIssuerSigningKey = true,
                 };
-            });
+            })
+            .AddCookie(options =>
+                        {
+                            options.LoginPath = "/account/login";
+                            options.LogoutPath = "/account/logout";
+                            options.ExpireTimeSpan = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
+                            options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                            options.Cookie.SameSite = SameSiteMode.None;
+                            options.Cookie.Name = "ConnectUs.Cookies";
+                            //options.SlidingExpiration = true;
+                            options.Cookie.HttpOnly = true;
+
+                        });
+
 
             #endregion
+
+            services.AddControllers();
 
             services.AddDbContext<BaseDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-            
+
             services.AddTransient<IAccountService, AccountService>();
             services.AddScoped<IMeetupService, MeetupService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMeetupAdminService, MeetupAdminService>();
+
 
             services.AddIdentity<User, IdentityRole>()
                     .AddEntityFrameworkStores<BaseDbContext>()
                     .AddDefaultTokenProviders();
 
             services.AddMemoryCache();
-            services.AddControllers();
 
         }
 
@@ -145,6 +143,22 @@ namespace ConnectUs
             }
 
             app.UseRouting();
+            app.UseCookiePolicy(new CookiePolicyOptions 
+            {
+                //CheckConsentNeeded = context => true,
+                MinimumSameSitePolicy = SameSiteMode.None,
+                HttpOnly = HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always
+
+            });
+            app.Use(async (context, next) =>
+            {
+                var token = context.Request.Cookies[".AspNetCore.Application.Id"];
+                if (!string.IsNullOrEmpty(token))
+                    context.Request.Headers.Add("Authorization", "Bearer " + token);
+
+                await next();
+            });
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -158,7 +172,6 @@ namespace ConnectUs
             {
                 ForwardedHeaders = ForwardedHeaders.All
             });
-            // custom jwt auth middleware
 
 
             app.UseEndpoints(endpoints =>

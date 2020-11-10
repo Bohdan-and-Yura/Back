@@ -30,7 +30,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("creators")]
         public ActionResult<ResponseModel<IEnumerable<UserListDTO>>> GetAll()
         {
             var users = _userService.GetAll();

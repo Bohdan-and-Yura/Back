@@ -27,11 +27,11 @@ namespace ConnectUs.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> Delete(string meetupId, List<Claim> user)
+        public async Task<bool> Delete(string meetupId,string userId)
         {
 
             var meetup = _context.Meetups.FirstOrDefault(c => c.Id == Guid.Parse(meetupId));
-            if (meetup.CreatedByUser == user.FirstOrDefault().Value || user[1].Value == "Admin")
+            if (meetup.CreatedByUser == userId)
             {
                 _context.Meetups.Remove(meetup);
                 await _context.SaveChangesAsync();
@@ -45,14 +45,14 @@ namespace ConnectUs.Infrastructure.Repositories
             return await _context.Meetups.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
         }
 
-        public IEnumerable<Meetup> GetMeetups(List<Claim> user)
+        public IEnumerable<Meetup> GetMeetups(string userId)
         {
-            return _context.Meetups.ToList().Where(c => c.CreatedByUser == user.FirstOrDefault().Value);
+            return _context.Meetups.ToList().Where(c => c.CreatedByUser == userId).Reverse();
         }
 
-        public async Task<bool> Update(Meetup meetup, List<Claim> user)
+        public async Task<bool> Update(Meetup meetup, string userId)
         {
-            if (meetup.CreatedByUser == user.FirstOrDefault().Value || user[1].Value == "Admin")
+            if (meetup.CreatedByUser == userId)
             {
 
                 _context.Meetups.Update(meetup);
@@ -62,6 +62,13 @@ namespace ConnectUs.Infrastructure.Repositories
             }
             return false;
 
+        }
+        public List<MeetupUser> GetJoinedMeetups(string userId)
+        {
+        
+            var user = _context.Users.FirstOrDefault(c=>c.Id== userId);
+            var meetups = user.MeetupsJoined.ToList();
+            return meetups;
         }
     }
 }

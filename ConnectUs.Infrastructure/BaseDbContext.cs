@@ -24,12 +24,12 @@ namespace ConnectUs.Infrastructure
 
             builder.Entity<MeetupUser>()
                 .HasOne(bc => bc.User)
-                .WithMany(b => b.Meetups)
+                .WithMany(b => b.MeetupsJoined)
                 .HasForeignKey(bc => bc.UserId);
 
             builder.Entity<MeetupUser>()
                 .HasOne(bc => bc.Meetup)
-                .WithMany(c => c.Users)
+                .WithMany(c => c.UsersJoined)
                 .HasForeignKey(bc => bc.MeetupId);
 
             base.OnModelCreating(builder);

@@ -19,8 +19,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     /// </summary>
     [Route("api/admin/users")]
     [ApiController]
-    [Authorize(Roles = Role.Admin)]
-
+    //[Authorize(Roles = Role.Admin)]
     public class AdminUserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -36,7 +35,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// <param name="id">user id</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = Role.Admin)]
+        //[Authorize(Roles = Role.Admin)]
         public ActionResult<ResponseModel<UserDataDTO>> DeleteById(string id)
         {
 
@@ -53,7 +52,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Authorize(Roles = Role.Admin)]
+        //[Authorize(Roles = Role.Admin)]
         public ActionResult<ResponseModel<IEnumerable<UserListDTO>>> GetAll()
         {
             var users = _userService.GetAll();
@@ -62,7 +61,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize(Roles = Role.Admin)]
+        //[Authorize(Roles = Role.Admin)]
         public async Task<ActionResult<ResponseModel<IEnumerable<UserMeetupsDTO>>>> Fetch(string userId)
         {
             var user = await _userService.GetByIdAsync(userId);

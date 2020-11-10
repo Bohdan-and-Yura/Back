@@ -19,7 +19,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     /// </summary>
     [Route("api/admin/meetups")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class AdminMeetupController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -36,14 +36,15 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// <param name="meetupDto"></param>
         /// <returns></returns>
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Create([FromBody] CreateMeetupDTO meetupDto)
         {
             if (ModelState.IsValid)
             {
 
+                string userId = HttpContext.Request.Cookies["X-Username"];
                 var meetup = _mapper.Map<Meetup>(meetupDto);
-                meetup.CreatedByUser = HttpContext.User.Claims.FirstOrDefault().Value;
+                meetup.CreatedByUser = userId;
                 await _meetup.CreateAsync(meetup);
                 var response = _mapper.Map<MeetupResponseDTO>(meetup);
                 return Ok(new ResponseModel<MeetupResponseDTO>(response));
@@ -56,13 +57,13 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// </summary>
         /// <param name="meetupId"></param>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpDelete("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Delete(string meetupId)
         {
-            var user = HttpContext.User.Claims.ToList();
+            string userId = HttpContext.Request.Cookies["X-Username"];
 
-            var result = await _meetup.Delete(meetupId, user);
+            var result = await _meetup.Delete(meetupId, userId);
             if (result)
             {
                 return Ok(new ResponseModel<MeetupResponseDTO>());
@@ -74,13 +75,16 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// get list of meetups 
         /// </summary>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public ActionResult<ResponseModel<IEnumerable<MeetupResponseDTO>>> MyMeetups()
         {
-            var user = HttpContext.User.Claims.ToList();
-
-            var meetups = _meetup.GetMeetups(user);
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new ResponseModel<MeetupResponseDTO>("Smth went wronGG"));
+            }
+            var meetups = _meetup.GetMeetups(userId);
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             return (new ResponseModel<IEnumerable<MeetupResponseDTO>>(result));
         }
@@ -90,15 +94,15 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// <param name="meetupId"></param>
         /// <param name="meetupUpdateDTO"></param>
         /// <returns></returns>
-        [Authorize]
+        //[Authorize]
         [HttpPut("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupUpdateDTO>>> Update(string meetupId, [FromBody] MeetupUpdateDTO meetupUpdateDTO)
         {
             var meetup = _mapper.Map<Meetup>(meetupUpdateDTO);
             meetup.Id = Guid.Parse(meetupId);
-            var user = HttpContext.User.Claims.ToList();
+            string userId = HttpContext.Request.Cookies["X-Username"];
 
-            var result = await _meetup.Update(meetup, user);
+            var result = await _meetup.Update(meetup, userId);
             if (result)
             {
                 return Ok(new ResponseModel<MeetupUpdateDTO>(meetupUpdateDTO));
@@ -111,9 +115,9 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// </summary>
         /// <param name="meetupId"></param>
         /// <returns></returns>
-        [Authorize]
+        ////[Authorize]
         [HttpGet("{meetupId}")]
-        public async Task<ActionResult<MeetupResponseDTO>> Fetch(string meetupId)
+        public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Fetch(string meetupId)
         {
 
             var meetup= await _meetup.GetById(meetupId);
@@ -122,6 +126,16 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
 
         }
+        ////[Authorize]
+        [HttpGet("joined")]
+        public ActionResult<ResponseModel<List<MeetupUsersDTO>>> JoinedMeetups()
+        {
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            var meetup = _meetup.GetJoinedMeetups(userId);
+            var result = _mapper.Map<List<MeetupUsersDTO>>(meetup);
+            return new ResponseModel<List<MeetupUsersDTO>>(result);
+        }
+
 
     }
 }

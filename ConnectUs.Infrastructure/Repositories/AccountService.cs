@@ -37,14 +37,14 @@ namespace ConnectUs.Infrastructure.Repositories
             {
                 return null;
             }
-            return await _context.Users.Include(c => c.Meetups).FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Users.Include(c => c.MeetupsJoined).FirstOrDefaultAsync(c => c.Id == id);
 
         }
         public User Authenticate(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
-            var user = _context.Users.Include(c=>c.Meetups).SingleOrDefault(x => x.Email == email);
+            var user = _context.Users.Include(c=>c.MeetupsJoined).SingleOrDefault(x => x.Email == email);
 
             // check if userexists
             if (user == null)

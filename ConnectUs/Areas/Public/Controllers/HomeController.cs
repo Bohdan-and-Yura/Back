@@ -43,7 +43,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             int pageSize = 18;
 
             var meetups = await _meetup.GetList(searchQuery, sortState, isDescending);
-            
+            meetups.Reverse();
             PageViewModel pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
             var items = meetups.Skip(page - 1).Take(meetupsCount);
 
@@ -63,15 +63,15 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <param name="meetupId">from query</param>
         /// <returns></returns>
         [HttpPost("join")]
-        [Authorize]//authme
+        //[Authorize]//authme
         public async Task<IActionResult> JoinMeetup([FromQuery] string meetupId)
         {
-            var userId = HttpContext.User.Claims.FirstOrDefault();
-            if (string.IsNullOrEmpty(userId?.Value))
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
             }
-            var user = await _userService.GetByIdAsync(userId.Value);
+            var user = await _userService.GetByIdAsync(userId);
             if (user == null)
             {
                 return NotFound(new ResponseModel<User>("User not found"));
@@ -80,9 +80,20 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             if (meetup == null)
                 return NotFound(new ResponseModel<Meetup>("Meetup not found"));
 
-            await _meetup.AddUserToMeetup_AddMeetupToUserAsync(meetup, user);
+            await _meetup.AddUserToMeetup(meetup, user);
 
             return Ok(new ResponseModel<MeetupUser>());
+        }
+
+
+        [HttpGet("{meetupId}")]
+        [AllowAnonymous]
+        public async Task<ResponseModel<MeetupUsersDTO>> Fetch(string meetupId)
+        {
+            var meetups = await _meetup.GetByIdAsync(meetupId);
+            var result = _mapper.Map<MeetupUsersDTO>(meetups);
+            return new ResponseModel<MeetupUsersDTO>(result);
+
         }
     }
 }

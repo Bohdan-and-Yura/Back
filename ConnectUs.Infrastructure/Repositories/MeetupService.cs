@@ -25,18 +25,18 @@ namespace ConnectUs.Infrastructure.Repositories
             _mapper = mapper;
         }
 
-        public async Task AddUserToMeetup_AddMeetupToUserAsync(Meetup meetup, User user)
+        public async Task AddUserToMeetup(Meetup meetup, User user)
         {
             MeetupUser mu = new MeetupUser();
             mu.Meetup = meetup;
             mu.User = user;
-            user.Meetups.Add(mu);
-            meetup.Users.Add(mu);
+            user.MeetupsJoined.Add(mu);
+            meetup.UsersJoined.Add(mu);
             _context.MeetupsUsers.Add(mu);
             await _context.SaveChangesAsync();
 
         }
-
+       
         public async Task<Meetup> GetByIdAsync(string meetupId)
         {
             try
@@ -52,6 +52,7 @@ namespace ConnectUs.Infrastructure.Repositories
         public async Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState, bool isDescending = false)
         {
             var meetups = await _context.Meetups.ToListAsync();
+
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             if (isDescending == false)
             {
@@ -106,7 +107,7 @@ namespace ConnectUs.Infrastructure.Repositories
                         break;
                 }
             }
-            
+
             return result;
         }
     }
