@@ -88,11 +88,35 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         [HttpGet("{meetupId}")]
         [AllowAnonymous]
-        public async Task<ResponseModel<MeetupUsersDTO>> Fetch(string meetupId)
+        public async Task<ActionResult<ResponseModel<MeetupUsersDTO>>> Fetch(string meetupId)
         {
             var meetups = await _meetup.GetByIdAsync(meetupId);
+            if (meetups==null)
+            {
+                return NotFound(new ResponseModel<MeetupUsersDTO>("Meetup doesn't exist"));
+            }
             var result = _mapper.Map<MeetupUsersDTO>(meetups);
             return new ResponseModel<MeetupUsersDTO>(result);
+
+        }
+
+        ////[Authorize]
+        [HttpGet("joined")]
+        public ActionResult<ResponseModel<List<MeetupUsersDTO>>> JoinedMeetups()
+        {
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            var meetup = _meetup.GetJoinedMeetups(userId);
+            var result = _mapper.Map<List<MeetupUsersDTO>>(meetup);
+            return new ResponseModel<List<MeetupUsersDTO>>(result);
+        }
+        [HttpDelete("{meetupId}")]
+
+        public ActionResult<ResponseModel<MeetupResponseDTO>> Unjoin(string meetupId)
+        {
+            string userId = HttpContext.Request.Cookies["X-Username"];
+            //var result = _meetup.UnjoinMeetup(userId, meetupId);
+            return new ResponseModel<MeetupResponseDTO>("Strona nie gotowa");
+
 
         }
     }

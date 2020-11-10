@@ -44,6 +44,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
                 string userId = HttpContext.Request.Cookies["X-Username"];
                 var meetup = _mapper.Map<Meetup>(meetupDto);
+
                 meetup.CreatedByUser = userId;
                 await _meetup.CreateAsync(meetup);
                 var response = _mapper.Map<MeetupResponseDTO>(meetup);
@@ -72,7 +73,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             //return Forbid();
         }
         /// <summary>
-        /// get list of meetups 
+        /// meetups created by user 
         /// </summary>
         /// <returns></returns>
         //[Authorize]
@@ -82,7 +83,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             string userId = HttpContext.Request.Cookies["X-Username"];
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized(new ResponseModel<MeetupResponseDTO>("Smth went wronGG"));
+                return Unauthorized(new ResponseModel<MeetupResponseDTO>("Smth went wrong"));
             }
             var meetups = _meetup.GetMeetups(userId);
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
@@ -126,16 +127,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
 
 
         }
-        ////[Authorize]
-        [HttpGet("joined")]
-        public ActionResult<ResponseModel<List<MeetupUsersDTO>>> JoinedMeetups()
-        {
-            string userId = HttpContext.Request.Cookies["X-Username"];
-            var meetup = _meetup.GetJoinedMeetups(userId);
-            var result = _mapper.Map<List<MeetupUsersDTO>>(meetup);
-            return new ResponseModel<List<MeetupUsersDTO>>(result);
-        }
-
+       
 
     }
 }

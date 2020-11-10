@@ -47,12 +47,12 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public IEnumerable<Meetup> GetMeetups(string userId)
         {
-            return _context.Meetups.ToList().Where(c => c.CreatedByUser == userId).Reverse();
+            return _context.Meetups.ToList().Where(c => c.CreatedByUser== userId).Reverse();
         }
 
         public async Task<bool> Update(Meetup meetup, string userId)
         {
-            if (meetup.CreatedByUser == userId)
+            if (meetup.CreatedByUser== userId)
             {
 
                 _context.Meetups.Update(meetup);
@@ -63,12 +63,6 @@ namespace ConnectUs.Infrastructure.Repositories
             return false;
 
         }
-        public List<MeetupUser> GetJoinedMeetups(string userId)
-        {
-        
-            var user = _context.Users.FirstOrDefault(c=>c.Id== userId);
-            var meetups = user.MeetupsJoined.ToList();
-            return meetups;
-        }
+       
     }
 }

@@ -27,8 +27,13 @@ namespace ConnectUs.Web.App
         protected void MeetupAdminModels()
         {
             CreateMap<CreateMeetupDTO, Meetup>(MemberList.None);
-            CreateMap<Meetup, MeetupResponseDTO>();
-            CreateMap<Meetup, MeetupUsersDTO>();
+            CreateMap<Meetup, MeetupResponseDTO>()
+                .ForMember(c => c.UserId, o => o.MapFrom(c => c.UserCreator.Id))
+                .ForMember(c => c.UserName, o => o.MapFrom(c => c.UserCreator.UserName));
+            CreateMap<Meetup, MeetupUsersDTO>()
+                .ForMember(c=>c.UserId, o=>o.MapFrom(c=>c.UserCreator.Id))
+                .ForMember(c=>c.UserName, o=>o.MapFrom(c=>c.UserCreator.UserName));
+
             CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
         }
         protected void UserModels()

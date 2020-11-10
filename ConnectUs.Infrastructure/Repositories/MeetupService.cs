@@ -24,7 +24,19 @@ namespace ConnectUs.Infrastructure.Repositories
             _context = baseDbContext;
             _mapper = mapper;
         }
+        public List<MeetupUser> GetJoinedMeetups(string userId)
+        {
 
+            var user = _context.Users.FirstOrDefault(c => c.Id == userId);
+            var meetups = user.MeetupsJoined.ToList();
+            return meetups;
+        }
+
+        public void UnjoinMeetup(string userId, string meetupId)
+        {
+            var user = _context.Users.FirstOrDefault(c => c.Id == userId);
+
+        }
         public async Task AddUserToMeetup(Meetup meetup, User user)
         {
             MeetupUser mu = new MeetupUser();

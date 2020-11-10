@@ -14,6 +14,6 @@ namespace ConnectUs.Domain.IRepositories
         IEnumerable<Meetup> GetMeetups(string userId);
         Task<bool> Update(Meetup meetup, string userId);
         Task<Meetup> GetById(string meetupId);
-        List<MeetupUser> GetJoinedMeetups(string userId);
+        
     }
 }
