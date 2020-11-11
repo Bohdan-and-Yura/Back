@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace ConnectUs.Domain.Entities
 {
@@ -14,8 +14,8 @@ namespace ConnectUs.Domain.Entities
         public DateTime BirthDay { get; set; }
 
         public string Password { get; set; }
-        [NotMapped]
-        public string ConfirmPassword { get; set; }
+
+        [NotMapped] public string ConfirmPassword { get; set; }
 
         public byte[] PasswordHashByte { get; set; }
         public byte[] PasswordSaltByte { get; set; }

@@ -14,10 +14,9 @@ namespace ConnectUs.Domain.DTO.MeetupDTO
 
         public string Description { get; set; }
 
-        [Required]
-        public DateTime MeetupDate { get; set; }
-        [Required]
-        public string City { get; set; }
+        [Required] public DateTime MeetupDate { get; set; }
+
+        [Required] public string City { get; set; }
 
         public string MeetupImgPath { get; set; }
     }

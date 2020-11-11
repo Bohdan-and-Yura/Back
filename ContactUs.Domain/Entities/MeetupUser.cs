@@ -3,7 +3,6 @@
 namespace ConnectUs.Domain.Entities
 {
     /// <summary>
-    /// 
     /// </summary>
     public class MeetupUser
     {
@@ -11,7 +10,5 @@ namespace ConnectUs.Domain.Entities
         public string UserId { get; set; }
         public Meetup Meetup { get; set; }
         public User User { get; set; }
-
-
     }
 }

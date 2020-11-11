@@ -1,6 +1,6 @@
-﻿using ConnectUs.Domain.DTO.AccountDTO;
+﻿using System.Threading.Tasks;
+using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Domain.IRepositories.Public
 {

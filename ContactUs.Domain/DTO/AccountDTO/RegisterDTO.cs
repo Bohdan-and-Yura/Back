@@ -8,8 +8,10 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
         [Required]
-        [StringLength(20, ErrorMessage = "The username must be at least 6 characters long and max 20.", MinimumLength = 6)]
+        [StringLength(20, ErrorMessage = "The username must be at least 6 characters long and max 20.",
+            MinimumLength = 6)]
         [Display(Name = "Username")]
         public string UserName { get; set; }
 
@@ -23,6 +25,5 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-
     }
 }

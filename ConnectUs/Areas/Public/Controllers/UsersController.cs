@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace ConnectUs.Web.Areas.Public.Controllers
 {
     /// <summary>
-    /// for users control
+    ///     for users control
     /// </summary>
     [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         public UsersController(IUserService userService, IMapper mapper)
         {
@@ -42,8 +42,5 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             var result = _mapper.Map<UserMeetupsDTO>(user);
             return Ok(new ResponseModel<UserMeetupsDTO>(result));
         }
-
-
-
     }
 }

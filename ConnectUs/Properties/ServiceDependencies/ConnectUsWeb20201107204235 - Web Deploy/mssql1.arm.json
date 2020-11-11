@@ -7,7 +7,8 @@
       "defaultValue": "ConnectUsWeb20201107204235ResourceGroup",
       "metadata": {
         "_parameterType": "resourceGroup",
-        "description": "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
+        "description":
+          "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
       }
     },
     "resourceGroupLocation": {
@@ -23,7 +24,8 @@
       "defaultValue": "[parameters('resourceGroupLocation')]",
       "metadata": {
         "_parameterType": "location",
-        "description": "Location of the resource. By default use resource group's location, unless the resource provider is not supported there."
+        "description":
+          "Location of the resource. By default use resource group's location, unless the resource provider is not supported there."
       }
     }
   },
@@ -36,7 +38,8 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('ConnectUs.Web_db', subscription().subscriptionId)))]",
+      "name":
+        "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('ConnectUs.Web_db', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [

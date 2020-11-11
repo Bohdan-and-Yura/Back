@@ -8,16 +8,16 @@ namespace ConnectUs.Infrastructure
     {
         public BaseDbContext(DbContextOptions<BaseDbContext> options) : base(options)
         {
-
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Meetup> Meetups { get; set; }
         public DbSet<MeetupUser> MeetupsUsers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
-
             builder.Entity<MeetupUser>()
-                 .HasKey(bc => new { bc.UserId, bc.MeetupId });
+                .HasKey(bc => new {bc.UserId, bc.MeetupId});
 
             builder.Entity<MeetupUser>()
                 .HasOne(bc => bc.User)

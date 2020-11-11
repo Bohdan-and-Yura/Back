@@ -1,48 +1,47 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Admin.Controllers
 {
     /// <summary>
-    /// only admin
+    ///     only admin
     /// </summary>
     [Route("api/admin/users")]
     [ApiController]
     //[Authorize(Roles = Role.Admin)]
     public class AdminUserController : ControllerBase
     {
-        private readonly IAdminUserService _userService;
         private readonly IMapper _mapper;
+        private readonly IAdminUserService _userService;
 
         public AdminUserController(IAdminUserService userService, IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
-        }/// <summary>
-         /// delete user by id
-         /// </summary>
-         /// <param name="id">user id</param>
-         /// <returns></returns>
+        }
+
+        /// <summary>
+        ///     delete user by id
+        /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         //[Authorize(Roles = Role.Admin)]
         public ActionResult<ResponseModel<UserDataDTO>> DeleteById(string id)
         {
-
             // only allow admins to access other user records
             var result = _userService.Delete(id);
-            if (result.Result == false)
-            {
-                return BadRequest(new ResponseModel<UserDataDTO>("User not found"));
-            }
+            if (result.Result == false) return BadRequest(new ResponseModel<UserDataDTO>("User not found"));
             return Ok(new ResponseModel<UserDataDTO>());
         }
+
         /// <summary>
-        /// get all users
+        ///     get all users
         /// </summary>
         /// <returns></returns>
         [HttpGet]

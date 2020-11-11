@@ -1,12 +1,12 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories.Admin
 {
@@ -20,6 +20,7 @@ namespace ConnectUs.Infrastructure.Repositories.Admin
             _context = baseDbContext;
             _mapper = mapper;
         }
+
         public async Task CreateAsync(Meetup meetup)
         {
             var user = await _context.Users.FirstOrDefaultAsync(c => c.Id == meetup.CreatedByUser);
@@ -30,7 +31,6 @@ namespace ConnectUs.Infrastructure.Repositories.Admin
 
         public async Task<bool> Delete(string meetupId, string userId)
         {
-
             var meetup = _context.Meetups.FirstOrDefault(c => c.Id == Guid.Parse(meetupId));
             if (meetup.CreatedByUser == userId)
             {
@@ -38,6 +38,7 @@ namespace ConnectUs.Infrastructure.Repositories.Admin
                 await _context.SaveChangesAsync();
                 return true;
             }
+
             return false;
         }
 
@@ -54,18 +55,15 @@ namespace ConnectUs.Infrastructure.Repositories.Admin
         public async Task<bool> Update(MeetupUpdateDTO meetup, string userId, string meetupId)
         {
             var meetupOriginal = _context.Meetups.FirstOrDefault(c => c.Id == Guid.Parse(meetupId));
-            var res = _mapper.Map<MeetupUpdateDTO, Meetup>(meetup, meetupOriginal);
+            var res = _mapper.Map(meetup, meetupOriginal);
             if (res.CreatedByUser.ToLower() == userId.ToLower())
             {
-
                 _context.Meetups.Update(res);
                 await _context.SaveChangesAsync();
                 return true;
-
             }
+
             return false;
-
         }
-
     }
 }

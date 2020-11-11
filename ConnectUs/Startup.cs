@@ -35,21 +35,18 @@ namespace ConnectUs.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddCors();
 
             services.AddSwaggerGen();
+
             #region automapper
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddAutoMapper(typeof(AutoMapperProfile));
 
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new AutoMapperProfile());
-            });
+            var mapperConfig = new MapperConfiguration(mc => { mc.AddProfile(new AutoMapperProfile()); });
 
-            IMapper mapper = mapperConfig.CreateMapper();
+            var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
             #endregion
@@ -57,40 +54,38 @@ namespace ConnectUs.Web
             #region cookies configure
 
             services.AddAuthentication(o =>
-            {
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-            {
-                options.RequireHttpsMetadata = true;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidIssuer = AuthOptions.ISSUER,
+                    o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    o.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+                    o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }).AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.RequireHttpsMetadata = true;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = AuthOptions.ISSUER,
 
-                    ValidateAudience = true,
-                    ValidAudience = AuthOptions.AUDIENCE,
-                    ValidateLifetime = true,
+                        ValidateAudience = true,
+                        ValidAudience = AuthOptions.AUDIENCE,
+                        ValidateLifetime = true,
 
-                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                    ValidateIssuerSigningKey = true,
-                };
-            })
-            .AddCookie(options =>
-                        {
-                            options.LoginPath = "/account/login";
-                            options.LogoutPath = "/account/logout";
-                            options.ExpireTimeSpan = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
-                            options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                            options.Cookie.SameSite = SameSiteMode.None;
-                            options.Cookie.Name = "ConnectUs.Cookies";
-                            //options.SlidingExpiration = true;
-                            options.Cookie.HttpOnly = true;
-
-                        });
-
+                        IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                        ValidateIssuerSigningKey = true
+                    };
+                })
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/account/login";
+                    options.LogoutPath = "/account/logout";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(AuthOptions.LIFETIME);
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.Name = "ConnectUs.Cookies";
+                    //options.SlidingExpiration = true;
+                    options.Cookie.HttpOnly = true;
+                });
 
             #endregion
 
@@ -109,11 +104,10 @@ namespace ConnectUs.Web
 
 
             services.AddIdentity<User, IdentityRole>()
-                    .AddEntityFrameworkStores<BaseDbContext>()
-                    .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<BaseDbContext>()
+                .AddDefaultTokenProviders();
 
             services.AddMemoryCache();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -121,19 +115,14 @@ namespace ConnectUs.Web
         {
             app.UseDefaultFiles();
             app.UseStaticFiles();
-            app.UseSwagger(c =>
-            {
-                c.SerializeAsV2 = true;
-            }); app.UseSwaggerUI(c =>
+            app.UseSwagger(c => { c.SerializeAsV2 = true; });
+            app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
                 c.RoutePrefix = string.Empty;
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseRouting();
             app.UseCookiePolicy(new CookiePolicyOptions
@@ -142,7 +131,6 @@ namespace ConnectUs.Web
                 MinimumSameSitePolicy = SameSiteMode.None,
                 HttpOnly = HttpOnlyPolicy.Always,
                 Secure = CookieSecurePolicy.Always
-
             });
             app.Use(async (context, next) =>
             {
@@ -156,24 +144,20 @@ namespace ConnectUs.Web
             app.UseAuthorization();
 
             app.UseCors(x => x
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               .SetIsOriginAllowed(origin => true) // allow any origin
-               .AllowCredentials()
-               ); //
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()
+            ); //
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.All
             });
 
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             mapper.ConfigurationProvider.AssertConfigurationIsValid();
-
         }
     }
 }

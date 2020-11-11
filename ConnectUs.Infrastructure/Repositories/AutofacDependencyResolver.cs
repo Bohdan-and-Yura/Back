@@ -9,10 +9,12 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public AutofacDependencyResolver(ILifetimeScope lifetimeScope)
         {
-            this._lifetimeScope = lifetimeScope;
+            _lifetimeScope = lifetimeScope;
         }
 
         public T ResolveOrDefault<T>() where T : class
-            => _lifetimeScope.ResolveOptional<T>();
+        {
+            return _lifetimeScope.ResolveOptional<T>();
+        }
     }
 }

@@ -11,7 +11,6 @@ namespace ConnectUs.Web.App
     {
         public AutoMapperProfile()
         {
-
             UserModels();
             MeetupAdminModels();
             Joined();
@@ -22,8 +21,8 @@ namespace ConnectUs.Web.App
             UserModels();
             MeetupAdminModels();
             Joined();
-
         }
+
         protected void MeetupAdminModels()
         {
             CreateMap<CreateMeetupDTO, Meetup>(MemberList.None);
@@ -36,11 +35,12 @@ namespace ConnectUs.Web.App
 
             CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
         }
+
         public void Joined()
         {
             CreateMap<MeetupUser, JoinedListDTO>();
-
         }
+
         protected void UserModels()
         {
             CreateMap<User, UserDataDTO>(MemberList.None).ForMember(c => c.Id, o => o.MapFrom(c => c.Id));
@@ -71,7 +71,6 @@ namespace ConnectUs.Web.App
             //.ForMember(c => c.TwoFactorEnabled, o => o.Ignore());
 
             CreateMap<LoginRequestDTO, User>(MemberList.None);
-
         }
     }
 }

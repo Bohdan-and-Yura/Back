@@ -14,6 +14,5 @@ namespace ConnectUs.Domain.Entities
         public string CreatedByUser { get; set; }
         public ICollection<MeetupUser> UsersJoined { get; set; }
         public User UserCreator { get; set; }
-
     }
 }

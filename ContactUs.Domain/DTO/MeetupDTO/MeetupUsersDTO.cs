@@ -1,6 +1,6 @@
-﻿using ConnectUs.Domain.DTO.UserDTO;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using ConnectUs.Domain.DTO.UserDTO;
 
 namespace ConnectUs.Domain.DTO.MeetupDTO
 {
@@ -14,8 +14,5 @@ namespace ConnectUs.Domain.DTO.MeetupDTO
         public string UserCreatorId { get; set; }
         public string UserCreatorName { get; set; }
         public ICollection<UserDataDTO> UsersJoined { get; set; }
-
-
-
     }
 }

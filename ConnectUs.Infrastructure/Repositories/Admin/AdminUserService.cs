@@ -1,10 +1,10 @@
-﻿using ConnectUs.Domain.Entities;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories.Admin
 {
@@ -16,9 +16,10 @@ namespace ConnectUs.Infrastructure.Repositories.Admin
         {
             _context = context;
         }
+
         public async Task<bool> Delete(string id)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Id == (id));
+            var user = _context.Users.FirstOrDefault(x => x.Id == id);
             if (user == null)
                 return false;
             _context.Users.Remove(user);

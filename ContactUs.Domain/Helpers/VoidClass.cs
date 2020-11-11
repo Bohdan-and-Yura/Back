@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ConnectUs.Domain.Helpers
+﻿namespace ConnectUs.Domain.Helpers
 {
     public class VoidClass
     {

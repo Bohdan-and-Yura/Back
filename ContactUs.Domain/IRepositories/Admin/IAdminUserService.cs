@@ -1,6 +1,6 @@
-﻿using ConnectUs.Domain.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConnectUs.Domain.Entities;
 
 namespace ConnectUs.Domain.IRepositories.Admin
 {

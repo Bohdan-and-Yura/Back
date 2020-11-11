@@ -1,7 +1,7 @@
-﻿using ConnectUs.Domain.DTO.MeetupDTO;
-using ConnectUs.Domain.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConnectUs.Domain.DTO.MeetupDTO;
+using ConnectUs.Domain.Entities;
 
 namespace ConnectUs.Domain.IRepositories.Admin
 {
@@ -12,6 +12,5 @@ namespace ConnectUs.Domain.IRepositories.Admin
         IEnumerable<Meetup> GetMyMeetups(string userId);
         Task<bool> Update(MeetupUpdateDTO meetup, string userId, string meetupId);
         Task<Meetup> GetById(string meetupId);
-
     }
 }

@@ -1,12 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
 using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories.Public
 {
@@ -22,7 +22,6 @@ namespace ConnectUs.Infrastructure.Repositories.Public
         }
 
 
-
         public IEnumerable<UserListDTO> GetAll()
         {
             var user = _context.Users.Include(c => c.MeetupsJoined).ToList().Where(c => c.MeetupsJoined.Count > 0);
@@ -35,7 +34,5 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             var user = await _context.Users.Include(c => c.MeetupsJoined).FirstOrDefaultAsync(x => x.Id == id);
             return user.WithoutPassword();
         }
-
-
     }
 }

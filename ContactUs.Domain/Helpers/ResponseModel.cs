@@ -2,11 +2,8 @@
 {
     public class ResponseModel<T> where T : class
     {
-        public T Data { get; set; }
-        public string Message { get; set; }
-        public short ResultCode { get; set; }
         /// <summary>
-        /// returns ok
+        ///     returns ok
         /// </summary>
         /// <param name="Data"></param>
         public ResponseModel(T Data = null)
@@ -14,8 +11,9 @@
             this.Data = Data;
             ResultCode = 0;
         }
+
         /// <summary>
-        /// returns error
+        ///     returns error
         /// </summary>
         /// <param name="message"></param>
         /// <param name="dto"></param>
@@ -23,8 +21,11 @@
         {
             Data = dto;
             ResultCode = 1;
-            Message = (message);
-
+            Message = message;
         }
+
+        public T Data { get; set; }
+        public string Message { get; set; }
+        public short ResultCode { get; set; }
     }
 }

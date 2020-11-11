@@ -1,6 +1,6 @@
-﻿using ConnectUs.Domain.DTO.MeetupDTO;
+﻿using System.Collections.Generic;
+using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.ViewModels;
-using System.Collections.Generic;
 
 namespace ConnectUs.Domain.DTO.PageResponseDTO
 {

@@ -8,13 +8,13 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
         public string UserImgPath { get; set; }
         public DateTime BirthDay { get; set; }
         public string Description { get; set; }
 
         public string UserName { get; set; }
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
+
+        [Required] [MinLength(6)] public string Password { get; set; }
     }
 }

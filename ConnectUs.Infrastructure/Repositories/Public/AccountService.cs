@@ -1,12 +1,13 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories.Public
 {
@@ -20,16 +21,13 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             _context = baseDbContext;
             _mapper = mapper;
         }
-       
+
         public async Task<User> GetUserById(string? id)
         {
-            if (string.IsNullOrEmpty(id))
-            {
-                return null;
-            }
+            if (string.IsNullOrEmpty(id)) return null;
             return await _context.Users.Include(c => c.MeetupsJoined).FirstOrDefaultAsync(c => c.Id == id);
-
         }
+
         public User Authenticate(string email, string password)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
@@ -47,30 +45,10 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             // authentication successful
             return user;
         }
-        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-        {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
-            if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
-            if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
-
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++)
-                {
-                    //password verifications
-                    if (computedHash[i] != storedHash[i]) return false;
-                }
-            }
-
-            return true;
-        }
 
 
         public async Task<User> CreateAsync(User newUser)
         {
-
             if (_context.Users.Any(c => c.Email == newUser.Email))
                 return null;
             byte[] passwordHash;
@@ -81,37 +59,58 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
             return newUser;
-
-        }
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
         }
 
         public async Task<EditUserDTO> UpdateAsync(string id, EditUserDTO editModel)
         {
-            User user = await GetUserById(id);
+            var user = await GetUserById(id);
             if (user != null)
             {
-                var result = _mapper.Map<EditUserDTO, User>(editModel, user);
+                var result = _mapper.Map(editModel, user);
                 _context.Users.Update(result);
                 await _context.SaveChangesAsync();
                 return editModel;
             }
+
             return null;
         }
 
         public async Task DeleteAsync(string id)
         {
-            User user = await GetUserById(id);
+            var user = await GetUserById(id);
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
+        }
 
+        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            if (password == null) throw new ArgumentNullException("password");
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+            if (storedHash.Length != 64)
+                throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
+            if (storedSalt.Length != 128)
+                throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
+
+            using (var hmac = new HMACSHA512(storedSalt))
+            {
+                var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+                for (var i = 0; i < computedHash.Length; i++)
+                    //password verifications
+                    if (computedHash[i] != storedHash[i])
+                        return false;
+            }
+
+            return true;
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
         }
     }
 }

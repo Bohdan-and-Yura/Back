@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
 using ConnectUs.Domain.Core;
 using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.DTO.UserDTO;
@@ -12,16 +17,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Public.Controllers
 {
     /// <summary>
-    /// for user authenticate
+    ///     for user authenticate
     /// </summary>
     [Route("api/account")]
     [ApiController]
@@ -40,30 +40,25 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
 
         /// <summary>
-        /// get my account
+        ///     get my account
         /// </summary>
         /// <returns></returns>
         [HttpGet("myAccount")]
         //[Authorize]
         public async Task<ActionResult<ResponseModel<UserDataDTO>>> MyAccount()
         {
-            string userId = HttpContext.Request.Cookies["X-Username"];
+            var userId = HttpContext.Request.Cookies["X-Username"];
             if (string.IsNullOrEmpty(userId ?? ""))
-            {
                 return Unauthorized(new ResponseModel<UserDataDTO>("Man, you are not logined"));
-            }
 
             var user = await _account.GetUserById(userId);
             var result = _mapper.Map<UserDataDTO>(user);
-            if (result == null)
-            {
-                return Ok(new ResponseModel<UserDataDTO>("User not found. Wrong id"));
-
-            }
+            if (result == null) return Ok(new ResponseModel<UserDataDTO>("User not found. Wrong id"));
             return Ok(new ResponseModel<UserDataDTO>(result));
         }
+
         /// <summary>
-        /// login
+        ///     login
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -79,27 +74,28 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             // returns basic user info and authentication token
             return Ok(new ResponseModel<LoginResponseDTO>(responseData));
         }
+
         private async Task<LoginResponseDTO> TokenAuthenticate(User user)
         {
             user.RefreshToken = Guid.NewGuid().ToString();
             var jwt = new JwtSecurityToken(
-                     issuer: AuthOptions.ISSUER,
-                     audience: AuthOptions.AUDIENCE,
-                     notBefore: DateTime.UtcNow,
-                     expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
-                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
+                AuthOptions.ISSUER,
+                AuthOptions.AUDIENCE,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.Add(TimeSpan.FromDays(AuthOptions.LIFETIME)),
+                signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),
+                    SecurityAlgorithms.HmacSha256));
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwt);
-
 
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Id),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim("access_token", tokenString)
             };
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties()
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
                 IsPersistent = true
             };
@@ -109,9 +105,12 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
 
-            Response.Cookies.Append("X-Access-Token", tokenString, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
-            Response.Cookies.Append("X-Username", user.Id, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
-            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
+            Response.Cookies.Append("X-Access-Token", tokenString,
+                new CookieOptions {HttpOnly = true, SameSite = SameSiteMode.None});
+            Response.Cookies.Append("X-Username", user.Id,
+                new CookieOptions {HttpOnly = true, SameSite = SameSiteMode.None});
+            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken,
+                new CookieOptions {HttpOnly = true, SameSite = SameSiteMode.None});
             return new LoginResponseDTO
             {
                 Id = user.Id,
@@ -122,7 +121,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
 
         /// <summary>
-        /// register
+        ///     register
         /// </summary>
         /// <param name="registerDTO"></param>
         /// <returns></returns>
@@ -141,34 +140,29 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 user.BirthDay = Convert.ToDateTime(user.BirthDay.ToShortDateString());
                 var result = await _account.CreateAsync(user);
                 if (result != null)
-                {
                     return Ok(new ResponseModel<RegisterDTO>());
-
-                }
-                else
-                {
-                    return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
-                }
+                return BadRequest(new ResponseModel<RegisterDTO>("Email is taken", registerDTO));
             }
 
             return BadRequest(new ResponseModel<RegisterDTO>("Invalid data", registerDTO));
-
         }
+
         /// <summary>
-        /// logout
+        ///     logout
         /// </summary>
         /// <returns></returns>
         [HttpGet("logout")]
         [ValidateAntiForgeryToken]
         //[Authorize]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult<ResponseModel<VoidClass>>> Logout()
         {
             // also delete authenticated  cookie  
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Accepted((new ResponseModel<LoginResponseDTO>()));
+            return Accepted(new ResponseModel<VoidClass>());
         }
+
         /// <summary>
-        /// update data account
+        ///     update data account
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
@@ -178,39 +172,28 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         {
             if (ModelState.IsValid)
             {
-                string userId = HttpContext.Request.Cookies["X-Username"];
+                var userId = HttpContext.Request.Cookies["X-Username"];
                 if (string.IsNullOrEmpty(userId))
-                {
                     return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
-                }
                 var result = await _account.UpdateAsync(userId, model);
-                if (result != null)
-                {
-                    return Ok(new ResponseModel<EditUserDTO>(model));
-                }
-               
-
+                if (result != null) return Ok(new ResponseModel<EditUserDTO>(model));
             }
+
             return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
         }
+
         /// <summary>
-        /// delete account
+        ///     delete account
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
         //[Authorize]
         public async Task<ActionResult<ResponseModel<VoidClass>>> DeleteAccount()
         {
-            string userId = HttpContext.Request.Cookies["X-Username"];
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(new ResponseModel<VoidClass>("User not loggined"));
-            }
+            var userId = HttpContext.Request.Cookies["X-Username"];
+            if (string.IsNullOrEmpty(userId)) return Unauthorized(new ResponseModel<VoidClass>("User not loggined"));
             await _account.DeleteAsync(userId);
             return Accepted(new ResponseModel<VoidClass>());
         }
-
-
-
     }
 }
