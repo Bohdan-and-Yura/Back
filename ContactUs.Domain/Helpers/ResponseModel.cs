@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
-
-namespace ConnectUs.Domain.Helpers
+﻿namespace ConnectUs.Domain.Helpers
 {
     public class ResponseModel<T> where T : class
     {
@@ -14,7 +9,7 @@ namespace ConnectUs.Domain.Helpers
         /// returns ok
         /// </summary>
         /// <param name="Data"></param>
-        public ResponseModel(T Data=null)
+        public ResponseModel(T Data = null)
         {
             this.Data = Data;
             ResultCode = 0;
@@ -24,7 +19,7 @@ namespace ConnectUs.Domain.Helpers
         /// </summary>
         /// <param name="message"></param>
         /// <param name="dto"></param>
-        public ResponseModel(string message,T dto=null)
+        public ResponseModel(string message, T dto = null)
         {
             Data = dto;
             ResultCode = 1;

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ConnectUs.Domain.DTO.AccountDTO
 {
@@ -26,6 +23,6 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-       
+
     }
 }

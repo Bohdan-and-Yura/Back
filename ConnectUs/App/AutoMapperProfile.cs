@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using ConnectUs.Domain.DTO;
 using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectUs.Web.App
 {
@@ -15,7 +11,7 @@ namespace ConnectUs.Web.App
     {
         public AutoMapperProfile()
         {
-            
+
             UserModels();
             MeetupAdminModels();
             Joined();
@@ -35,19 +31,19 @@ namespace ConnectUs.Web.App
                 .ForMember(c => c.UserCreatorId, o => o.MapFrom(c => c.UserCreator.Id))
                 .ForMember(c => c.UserCreatorName, o => o.MapFrom(c => c.UserCreator.UserName));
             CreateMap<Meetup, MeetupUsersDTO>()
-                .ForMember(c=>c.UserCreatorId, o=>o.MapFrom(c=>c.UserCreator.Id))
-                .ForMember(c=>c.UserCreatorName, o=>o.MapFrom(c=>c.UserCreator.UserName));
+                .ForMember(c => c.UserCreatorId, o => o.MapFrom(c => c.UserCreator.Id))
+                .ForMember(c => c.UserCreatorName, o => o.MapFrom(c => c.UserCreator.UserName));
 
             CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
         }
         public void Joined()
         {
             CreateMap<MeetupUser, JoinedListDTO>();
-            
+
         }
         protected void UserModels()
         {
-            CreateMap<User, UserDataDTO>(MemberList.None).ForMember(c=>c.Id,o=>o.MapFrom(c=>c.Id));
+            CreateMap<User, UserDataDTO>(MemberList.None).ForMember(c => c.Id, o => o.MapFrom(c => c.Id));
             CreateMap<User, UserListDTO>(MemberList.None);
             CreateMap<User, UserMeetupsDTO>(MemberList.None);
             CreateMap<EditUserDTO, User>(MemberList.None);
@@ -75,7 +71,7 @@ namespace ConnectUs.Web.App
             //.ForMember(c => c.TwoFactorEnabled, o => o.Ignore());
 
             CreateMap<LoginRequestDTO, User>(MemberList.None);
-                
+
         }
     }
 }

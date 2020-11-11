@@ -1,11 +1,9 @@
-﻿using ConnectUs.Domain.DTO.AccountDTO;
+﻿using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Domain.IRepositories
+namespace ConnectUs.Domain.IRepositories.Public
 {
     public interface IUserService
     {

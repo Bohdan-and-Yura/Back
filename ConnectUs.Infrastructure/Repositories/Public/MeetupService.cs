@@ -1,19 +1,16 @@
 ﻿using AutoMapper;
-using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
-using ConnectUs.Domain.IRepositories;
+using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Infrastructure.Repositories
+namespace ConnectUs.Infrastructure.Repositories.Public
 {
     public class MeetupService : IMeetupService
     {
@@ -28,7 +25,7 @@ namespace ConnectUs.Infrastructure.Repositories
         public List<JoinedListDTO> GetJoinedMeetups(string userId)
         {
 
-            var meetups = _context.MeetupsUsers.Include(c=>c.Meetup).Where(c => c.UserId == userId).AsNoTracking().ToList();
+            var meetups = _context.MeetupsUsers.Include(c => c.Meetup).Where(c => c.UserId == userId).AsNoTracking().ToList();
             var result = _mapper.Map<List<JoinedListDTO>>(meetups);
             return result;
         }
@@ -36,7 +33,7 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public async Task<bool> JoinMeetup(Meetup meetup, User user)
         {
-           var result= _context.MeetupsUsers.Any(c => c.MeetupId == meetup.Id && c.UserId == user.Id);
+            var result = _context.MeetupsUsers.Any(c => c.MeetupId == meetup.Id && c.UserId == user.Id);
             if (result)
             {
                 return false;

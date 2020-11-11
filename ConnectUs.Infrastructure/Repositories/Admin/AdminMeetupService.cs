@@ -1,18 +1,14 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
-using ConnectUs.Domain.IRepositories;
-using Microsoft.AspNetCore.Http;
+using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Infrastructure.Repositories
+namespace ConnectUs.Infrastructure.Repositories.Admin
 {
     public class AdminMeetupService : IAdminMeetupService
     {
@@ -26,13 +22,13 @@ namespace ConnectUs.Infrastructure.Repositories
         }
         public async Task CreateAsync(Meetup meetup)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(c=>c.Id==meetup.CreatedByUser);
+            var user = await _context.Users.FirstOrDefaultAsync(c => c.Id == meetup.CreatedByUser);
             meetup.UserCreator = user;
             await _context.Meetups.AddAsync(meetup);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> Delete(string meetupId,string userId)
+        public async Task<bool> Delete(string meetupId, string userId)
         {
 
             var meetup = _context.Meetups.FirstOrDefault(c => c.Id == Guid.Parse(meetupId));
@@ -52,14 +48,14 @@ namespace ConnectUs.Infrastructure.Repositories
 
         public IEnumerable<Meetup> GetMyMeetups(string userId)
         {
-            return _context.Meetups.ToList().Where(c => c.CreatedByUser== userId).Reverse();
+            return _context.Meetups.ToList().Where(c => c.CreatedByUser == userId).Reverse();
         }
 
         public async Task<bool> Update(MeetupUpdateDTO meetup, string userId, string meetupId)
         {
-            var meetupOriginal = _context.Meetups.FirstOrDefault(c=>c.Id==Guid.Parse(meetupId));
-            var res = _mapper.Map<MeetupUpdateDTO,Meetup>(meetup, meetupOriginal);
-            if (res.CreatedByUser.ToLower()== userId.ToLower())
+            var meetupOriginal = _context.Meetups.FirstOrDefault(c => c.Id == Guid.Parse(meetupId));
+            var res = _mapper.Map<MeetupUpdateDTO, Meetup>(meetup, meetupOriginal);
+            if (res.CreatedByUser.ToLower() == userId.ToLower())
             {
 
                 _context.Meetups.Update(res);
@@ -70,6 +66,6 @@ namespace ConnectUs.Infrastructure.Repositories
             return false;
 
         }
-       
+
     }
 }

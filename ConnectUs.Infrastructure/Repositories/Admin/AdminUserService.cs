@@ -1,16 +1,14 @@
 ﻿using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
+using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Infrastructure.Repositories
+namespace ConnectUs.Infrastructure.Repositories.Admin
 {
-    public class AdminUserService: IAdminUserService
+    public class AdminUserService : IAdminUserService
     {
         private readonly BaseDbContext _context;
 

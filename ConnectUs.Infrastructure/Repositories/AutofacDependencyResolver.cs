@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Autofac;
+﻿using Autofac;
 using ConnectUs.Domain.IRepositories;
 
-namespace ConnectUs.Infrastructure
+namespace ConnectUs.Infrastructure.Repositories
 {
     public class AutofacDependencyResolver : IDependencyResolver
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ConnectUs.Domain.DTO.AccountDTO
+﻿namespace ConnectUs.Domain.DTO.UserDTO
 {
     public class UserListDTO
     {

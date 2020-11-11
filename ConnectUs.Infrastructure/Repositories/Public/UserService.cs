@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
-using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
+using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Infrastructure.Repositories
+namespace ConnectUs.Infrastructure.Repositories.Public
 {
     public class UserService : IUserService
     {
@@ -23,7 +21,7 @@ namespace ConnectUs.Infrastructure.Repositories
             _mapper = mapper;
         }
 
-     
+
 
         public IEnumerable<UserListDTO> GetAll()
         {

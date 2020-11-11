@@ -1,8 +1,4 @@
 ﻿using ConnectUs.Domain.DTO.MeetupDTO;
-using ConnectUs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConnectUs.Domain.DTO.JoinedDTO
 {

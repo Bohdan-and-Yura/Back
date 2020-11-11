@@ -1,10 +1,8 @@
 ﻿using ConnectUs.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Domain.IRepositories
+namespace ConnectUs.Domain.IRepositories.Admin
 {
     public interface IAdminUserService
     {

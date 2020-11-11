@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ConnectUs.Domain.Core
+﻿namespace ConnectUs.Domain.Core
 {
     public static class Role
     {

@@ -1,35 +1,27 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AutoMapper;
+using ConnectUs.Domain.Core;
 using ConnectUs.Domain.Entities;
+using ConnectUs.Domain.IRepositories.Admin;
+using ConnectUs.Domain.IRepositories.Public;
 using ConnectUs.Infrastructure;
+using ConnectUs.Infrastructure.Repositories.Admin;
+using ConnectUs.Infrastructure.Repositories.Public;
+using ConnectUs.Web.App;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
-using ConnectUs.Domain.IRepositories;
-using ConnectUs.Infrastructure.Repositories;
-using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.Core;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using ConnectUs.Web.App;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Mvc.Cors;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Options;
 
-namespace ConnectUs
+namespace ConnectUs.Web
 {
     public class Startup
     {
@@ -113,6 +105,7 @@ namespace ConnectUs
             services.AddScoped<IMeetupService, MeetupService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminMeetupService, AdminMeetupService>();
+            services.AddScoped<IAdminUserService, AdminUserService>();
 
 
             services.AddIdentity<User, IdentityRole>()
@@ -143,7 +136,7 @@ namespace ConnectUs
             }
 
             app.UseRouting();
-            app.UseCookiePolicy(new CookiePolicyOptions 
+            app.UseCookiePolicy(new CookiePolicyOptions
             {
                 //CheckConsentNeeded = context => true,
                 MinimumSameSitePolicy = SameSiteMode.None,

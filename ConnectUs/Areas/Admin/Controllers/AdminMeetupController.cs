@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using ConnectUs.Domain.Core;
+﻿using AutoMapper;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
-using Microsoft.AspNetCore.Authorization;
+using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Admin.Controllers
 {
@@ -60,16 +56,16 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// <returns></returns>
         //[Authorize]
         [HttpDelete("{meetupId}")]
-        public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Delete(string meetupId)
+        public async Task<ActionResult<ResponseModel<VoidClass>>> Delete(string meetupId)
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
 
             var result = await _meetup.Delete(meetupId, userId);
             if (result)
             {
-                return Ok(new ResponseModel<MeetupResponseDTO>());
+                return Ok(new ResponseModel<VoidClass>());
             }
-            return NotFound(new ResponseModel<MeetupResponseDTO>("You don't own that meetup"));
+            return NotFound(new ResponseModel<VoidClass>("You don't own that meetup"));
             //return Forbid();
         }
         /// <summary>
@@ -99,7 +95,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         [HttpPut("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupUpdateDTO>>> Update(string meetupId, [FromBody] MeetupUpdateDTO meetupUpdateDTO)
         {
-            
+
             string userId = HttpContext.Request.Cookies["X-Username"];
 
             var result = await _meetup.Update(meetupUpdateDTO, userId, meetupId);
@@ -120,13 +116,13 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Fetch(string meetupId)
         {
 
-            var meetup= await _meetup.GetById(meetupId);
+            var meetup = await _meetup.GetById(meetupId);
             var result = _mapper.Map<MeetupResponseDTO>(meetup);
             return Ok(new ResponseModel<MeetupResponseDTO>(result));
 
 
         }
-       
+
 
     }
 }

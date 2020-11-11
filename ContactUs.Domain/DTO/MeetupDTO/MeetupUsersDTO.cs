@@ -1,7 +1,6 @@
-﻿using ConnectUs.Domain.DTO.AccountDTO;
+﻿using ConnectUs.Domain.DTO.UserDTO;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ConnectUs.Domain.DTO.MeetupDTO
 {

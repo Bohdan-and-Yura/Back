@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using ConnectUs.Domain.Core;
-using ConnectUs.Domain.DTO.AccountDTO;
-using ConnectUs.Domain.Entities;
+﻿using AutoMapper;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using ConnectUs.Domain.IRepositories.Admin;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Admin.Controllers
 {
@@ -30,10 +24,10 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             _userService = userService;
             _mapper = mapper;
         }/// <summary>
-        /// delete user by id
-        /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
+         /// delete user by id
+         /// </summary>
+         /// <param name="id">user id</param>
+         /// <returns></returns>
         [HttpDelete("{id}")]
         //[Authorize(Roles = Role.Admin)]
         public ActionResult<ResponseModel<UserDataDTO>> DeleteById(string id)

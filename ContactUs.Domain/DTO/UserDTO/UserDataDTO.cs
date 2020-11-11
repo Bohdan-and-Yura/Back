@@ -1,9 +1,6 @@
-﻿using ConnectUs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
-namespace ConnectUs.Domain.DTO.AccountDTO
+namespace ConnectUs.Domain.DTO.UserDTO
 {
     public class UserDataDTO
     {

@@ -1,20 +1,14 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO.AccountDTO;
 using ConnectUs.Domain.Entities;
-using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
-using Microsoft.AspNetCore.Mvc;
+using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Text.Unicode;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Infrastructure.Repositories
+namespace ConnectUs.Infrastructure.Repositories.Public
 {
     public class AccountService : IAccountService
     {
@@ -26,11 +20,7 @@ namespace ConnectUs.Infrastructure.Repositories
             _context = baseDbContext;
             _mapper = mapper;
         }
-        public User GetUserByEmail(string userName)
-        {
-            return _context.Users.FirstOrDefault(c => c.Email.ToLower() == userName.ToLower());
-
-        }
+       
         public async Task<User> GetUserById(string? id)
         {
             if (string.IsNullOrEmpty(id))
@@ -44,9 +34,9 @@ namespace ConnectUs.Infrastructure.Repositories
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 return null;
-            var user = _context.Users.Include(c=>c.MeetupsJoined).SingleOrDefault(x => x.Email == email);
+            var user = _context.Users.Include(c => c.MeetupsJoined).SingleOrDefault(x => x.Email == email);
 
-            // check if userexists
+            // check if user exists
             if (user == null)
                 return null;
 
@@ -108,7 +98,7 @@ namespace ConnectUs.Infrastructure.Repositories
             User user = await GetUserById(id);
             if (user != null)
             {
-                var result =_mapper.Map<User>(editModel);
+                var result = _mapper.Map<User>(editModel);
                 _context.Users.Update(result);
                 await _context.SaveChangesAsync();
                 return editModel;

@@ -1,12 +1,9 @@
 ﻿using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
-using System;
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectUs.Domain.IRepositories
+namespace ConnectUs.Domain.IRepositories.Admin
 {
     public interface IAdminMeetupService
     {
@@ -15,6 +12,6 @@ namespace ConnectUs.Domain.IRepositories
         IEnumerable<Meetup> GetMyMeetups(string userId);
         Task<bool> Update(MeetupUpdateDTO meetup, string userId, string meetupId);
         Task<Meetup> GetById(string meetupId);
-        
+
     }
 }

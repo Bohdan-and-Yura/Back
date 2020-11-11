@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using ConnectUs.Domain.Core;
-using ConnectUs.Domain.DTO.AccountDTO;
-using ConnectUs.Domain.Entities;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ConnectUs.Web.Areas.Admin.Controllers
+namespace ConnectUs.Web.Areas.Public.Controllers
 {
     /// <summary>
     /// for users control

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace ConnectUs.Domain.Entities
 {
@@ -17,6 +14,6 @@ namespace ConnectUs.Domain.Entities
         public string CreatedByUser { get; set; }
         public ICollection<MeetupUser> UsersJoined { get; set; }
         public User UserCreator { get; set; }
-        
+
     }
 }

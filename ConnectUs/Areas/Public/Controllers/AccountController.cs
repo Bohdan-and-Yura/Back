@@ -1,27 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using ConnectUs.Domain.Core;
-using ConnectUs.Domain.DTO;
 using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
-using ConnectUs.Infrastructure.Repositories;
+using ConnectUs.Domain.IRepositories.Public;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Public.Controllers
 {
@@ -55,7 +50,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             string userId = HttpContext.Request.Cookies["X-Username"];
             if (string.IsNullOrEmpty(userId ?? ""))
             {
-                return Unauthorized(new ResponseModel<UserDataDTO>("Man, you are not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("Man, you are not logined"));
             }
 
             var user = await _account.GetUserById(userId);
@@ -74,7 +69,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginRequestDTO model)
+        public async Task<ActionResult<ResponseModel<LoginResponseDTO>>> Login([FromBody] LoginRequestDTO model)
         {
             var user = _account.Authenticate(model.Email, model.Password);
 
@@ -133,7 +128,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<RegisterDTO>> Register([FromBody] RegisterDTO registerDTO)
+        public async Task<ActionResult<ResponseModel<RegisterDTO>>> Register([FromBody] RegisterDTO registerDTO)
         {
             if (ModelState.IsValid)
             {
@@ -179,7 +174,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [HttpPut]
         //[Authorize]
-        public async Task<ActionResult<EditUserDTO>> EditAccount([FromBody] EditUserDTO model)
+        public async Task<ActionResult<ResponseModel<EditUserDTO>>> EditAccount([FromBody] EditUserDTO model)
         {
             if (ModelState.IsValid)
             {
@@ -193,10 +188,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 {
                     return Ok(new ResponseModel<EditUserDTO>(model));
                 }
-                else
-                {
-                    return BadRequest(new ResponseModel<EditUserDTO>("Updating error", model));
-                }
+               
 
             }
             return BadRequest(new ResponseModel<EditUserDTO>("Data is not valid", model));
@@ -207,15 +199,15 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [HttpDelete]
         //[Authorize]
-        public async Task<IActionResult> DeleteAccount()
+        public async Task<ActionResult<ResponseModel<VoidClass>>> DeleteAccount()
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<VoidClass>("User not loggined"));
             }
             await _account.DeleteAsync(userId);
-            return Accepted(new ResponseModel<EditUserDTO>());
+            return Accepted(new ResponseModel<VoidClass>());
         }
 
 

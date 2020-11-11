@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Dynamic;
-using System.Globalization;
-using System.Text;
 
 namespace ConnectUs.Domain.Entities
 {

@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using ConnectUs.Domain.DTO.AccountDTO;
+﻿using AutoMapper;
 using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.DTO.PageResponseDTO;
+using ConnectUs.Domain.DTO.UserDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
 using ConnectUs.Domain.Helpers;
-using ConnectUs.Domain.IRepositories;
+using ConnectUs.Domain.IRepositories.Public;
 using ConnectUs.Domain.ViewModels;
-using ConnectUs.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ConnectUs.Web.Areas.Public.Controllers
 {
@@ -65,26 +63,26 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         /// <returns></returns>
         [HttpPost("join/{meetupId}")]
         //[Authorize]//authme
-        public async Task<ActionResult<MeetupUser>> JoinMeetup(string meetupId)
+        public async Task<ActionResult<VoidClass>> JoinMeetup(string meetupId)
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized(new ResponseModel<UserDataDTO>("User not loggined"));
+                return Unauthorized(new ResponseModel<VoidClass>("User not loggined"));
             }
             var user = await _userService.GetByIdAsync(userId);
             if (user == null)
             {
-                return NotFound(new ResponseModel<MeetupUser>("User not found"));
+                return NotFound(new ResponseModel<VoidClass>("User not found"));
             }
             var meetup = await _meetup.GetByIdAsync(meetupId);
             if (meetup == null)
-                return NotFound(new ResponseModel<MeetupResponseDTO>("Meetup not found"));
+                return NotFound(new ResponseModel<VoidClass>("Meetup not found"));
 
             var result = await _meetup.JoinMeetup(meetup, user);
             if (result)
             {
-                return Ok(new ResponseModel<MeetupUser>());
+                return Ok(new ResponseModel<VoidClass>());
 
             }
             return Ok(new ResponseModel<MeetupUser>("You are already joined"));
@@ -117,16 +115,16 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         }
         [HttpDelete("unjoin/{meetupId}")]
 
-        public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Unjoin(string meetupId)
+        public async Task<ActionResult<ResponseModel<VoidClass>>> Unjoin(string meetupId)
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
             var result = await _meetup.UnjoinMeetup(userId, meetupId);
             if (result)
             {
-                return Ok(new ResponseModel<MeetupResponseDTO>());
+                return Ok(new ResponseModel<VoidClass>());
 
             }
-            return new ResponseModel<MeetupResponseDTO>("You was not joined this meetup before");
+            return new ResponseModel<VoidClass>("You was not joined this meetup before");
 
 
         }

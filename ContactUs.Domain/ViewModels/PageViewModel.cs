@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ConnectUs.Domain.ViewModels
 {
@@ -11,7 +9,7 @@ namespace ConnectUs.Domain.ViewModels
         public PageViewModel(int itemsCount, int pageNumer, int pageSize)
         {
             PageNumber = pageNumer;
-            TotalPages = (int)Math.Ceiling(itemsCount/(double)pageSize);
+            TotalPages = (int)Math.Ceiling(itemsCount / (double)pageSize);
         }
         public bool HasPreviousPage
         {
@@ -19,7 +17,8 @@ namespace ConnectUs.Domain.ViewModels
             {
                 return (PageNumber > 1);
             }
-        }public bool HasNextPage
+        }
+        public bool HasNextPage
         {
             get
             {
