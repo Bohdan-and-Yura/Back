@@ -98,7 +98,7 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             User user = await GetUserById(id);
             if (user != null)
             {
-                var result = _mapper.Map<User>(editModel);
+                var result = _mapper.Map<EditUserDTO, User>(editModel, user);
                 _context.Users.Update(result);
                 await _context.SaveChangesAsync();
                 return editModel;

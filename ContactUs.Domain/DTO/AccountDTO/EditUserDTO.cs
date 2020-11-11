@@ -13,6 +13,8 @@ namespace ConnectUs.Domain.DTO.AccountDTO
         public string Description { get; set; }
 
         public string UserName { get; set; }
+        [Required]
+        [MinLength(6)]
         public string Password { get; set; }
     }
 }
