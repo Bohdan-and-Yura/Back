@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
@@ -24,13 +25,12 @@ namespace ConnectUs.Infrastructure.Repositories
             _context = baseDbContext;
             _mapper = mapper;
         }
-        public List<MeetupUser> GetJoinedMeetups(string userId)
+        public List<JoinedListDTO> GetJoinedMeetups(string userId)
         {
 
-            var user = _context.Users.Include(c=>c.MeetupsJoined).FirstOrDefault(c => c.Id == userId);
-
-            var meetups = user.MeetupsJoined.ToList();
-            return meetups;
+            var meetups = _context.MeetupsUsers.Include(c=>c.Meetup).Where(c => c.UserId == userId).AsNoTracking().ToList();
+            var result = _mapper.Map<List<JoinedListDTO>>(meetups);
+            return result;
         }
 
 

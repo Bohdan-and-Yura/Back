@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ConnectUs.Domain.DTO;
 using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using System;
@@ -17,24 +18,32 @@ namespace ConnectUs.Web.App
             
             UserModels();
             MeetupAdminModels();
+            Joined();
         }
 
         public AutoMapperProfile(string profileName) : base(profileName)
         {
             UserModels();
             MeetupAdminModels();
+            Joined();
+
         }
         protected void MeetupAdminModels()
         {
             CreateMap<CreateMeetupDTO, Meetup>(MemberList.None);
             CreateMap<Meetup, MeetupResponseDTO>()
-                .ForMember(c => c.UserId, o => o.MapFrom(c => c.UserCreator.Id))
-                .ForMember(c => c.UserName, o => o.MapFrom(c => c.UserCreator.UserName));
+                .ForMember(c => c.UserCreatorId, o => o.MapFrom(c => c.UserCreator.Id))
+                .ForMember(c => c.UserCreatorName, o => o.MapFrom(c => c.UserCreator.UserName));
             CreateMap<Meetup, MeetupUsersDTO>()
-                .ForMember(c=>c.UserId, o=>o.MapFrom(c=>c.UserCreator.Id))
-                .ForMember(c=>c.UserName, o=>o.MapFrom(c=>c.UserCreator.UserName));
+                .ForMember(c=>c.UserCreatorId, o=>o.MapFrom(c=>c.UserCreator.Id))
+                .ForMember(c=>c.UserCreatorName, o=>o.MapFrom(c=>c.UserCreator.UserName));
 
             CreateMap<MeetupUpdateDTO, Meetup>(MemberList.None);
+        }
+        public void Joined()
+        {
+            CreateMap<MeetupUser, JoinedListDTO>();
+            
         }
         protected void UserModels()
         {

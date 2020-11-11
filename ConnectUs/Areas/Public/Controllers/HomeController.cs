@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.DTO.JoinedDTO;
 using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.DTO.PageResponseDTO;
 using ConnectUs.Domain.Entities;
@@ -107,13 +108,12 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         //[Authorize]
         [HttpGet("joined")]
-        public ActionResult<ResponseModel<List<MeetupUsersDTO>>> JoinedMeetups()
+        public ActionResult<ResponseModel<List<JoinedListDTO>>> JoinedMeetups()
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
-            var meetup = _meetup.GetJoinedMeetups(userId);
+            var meetups = _meetup.GetJoinedMeetups(userId);
 
-            var result = _mapper.Map<List<MeetupUsersDTO>>(meetup);
-            return new ResponseModel<List<MeetupUsersDTO>>(result);
+            return new ResponseModel<List<JoinedListDTO>>(meetups);
         }
         [HttpDelete("unjoin/{meetupId}")]
 

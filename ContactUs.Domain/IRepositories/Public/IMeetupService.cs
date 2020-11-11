@@ -1,4 +1,5 @@
-﻿using ConnectUs.Domain.DTO.MeetupDTO;
+﻿using ConnectUs.Domain.DTO.JoinedDTO;
+using ConnectUs.Domain.DTO.MeetupDTO;
 using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.Enums;
 using System;
@@ -14,7 +15,7 @@ namespace ConnectUs.Domain.IRepositories
         Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState,bool isDescending=false);
         Task<Meetup> GetByIdAsync(string meetupId);
         Task<bool> JoinMeetup(Meetup meetup, User user);
-        List<MeetupUser> GetJoinedMeetups(string userId);
+        List<JoinedListDTO> GetJoinedMeetups(string userId);
         Task<bool> UnjoinMeetup(string userId, string meetupId);
     }
 }
