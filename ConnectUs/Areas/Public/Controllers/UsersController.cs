@@ -34,10 +34,8 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         public ActionResult<ResponseModel<IEnumerable<UserListDTO>>> GetAll()
         {
             var users = _userService.GetAll();
-            var result = _mapper.Map<IEnumerable<UserListDTO>>(users);
-            return Ok(new ResponseModel<IEnumerable<UserListDTO>>(result));
+            return Ok(new ResponseModel<IEnumerable<UserListDTO>>(users));
         }
-
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ResponseModel<UserMeetupsDTO>>> Fetch(string id)

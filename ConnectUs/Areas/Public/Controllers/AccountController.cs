@@ -53,14 +53,12 @@ namespace ConnectUs.Web.Areas.Public.Controllers
         public async Task<ActionResult<ResponseModel<UserDataDTO>>> MyAccount()
         {
             string userId = HttpContext.Request.Cookies["X-Username"];
-
-            var t = HttpContext.User;
-            if (string.IsNullOrEmpty(userId??""))
+            if (string.IsNullOrEmpty(userId ?? ""))
             {
-                return Unauthorized(new ResponseModel<UserDataDTO>("Vasya, you are not loggined"));
+                return Unauthorized(new ResponseModel<UserDataDTO>("Man, you are not loggined"));
             }
 
-            var user = await _account.GetUserById(userId?? "");
+            var user = await _account.GetUserById(userId);
             var result = _mapper.Map<UserDataDTO>(user);
             if (result == null)
             {
@@ -115,7 +113,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
-            
+
             Response.Cookies.Append("X-Access-Token", tokenString, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
             Response.Cookies.Append("X-Username", user.Id, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
             Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None });
@@ -140,7 +138,7 @@ namespace ConnectUs.Web.Areas.Public.Controllers
             if (ModelState.IsValid)
             {
                 if (string.IsNullOrEmpty(registerDTO.Password))
-                    return BadRequest(new ResponseModel<RegisterDTO>("Passord cannot be empty", registerDTO));
+                    return BadRequest(new ResponseModel<RegisterDTO>("Password cannot be empty", registerDTO));
 
 
                 var user = _mapper.Map<User>(registerDTO);
@@ -149,7 +147,6 @@ namespace ConnectUs.Web.Areas.Public.Controllers
                 var result = await _account.CreateAsync(user);
                 if (result != null)
                 {
-                    // cookie
                     return Ok(new ResponseModel<RegisterDTO>());
 
                 }

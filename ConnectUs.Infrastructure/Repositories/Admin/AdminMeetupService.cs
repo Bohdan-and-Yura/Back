@@ -1,4 +1,6 @@
-﻿using ConnectUs.Domain.Entities;
+﻿using AutoMapper;
+using ConnectUs.Domain.DTO.MeetupDTO;
+using ConnectUs.Domain.Entities;
 using ConnectUs.Domain.IRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -12,17 +14,20 @@ using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories
 {
-    public class MeetupAdminService : IMeetupAdminService
+    public class AdminMeetupService : IAdminMeetupService
     {
         private readonly BaseDbContext _context;
+        private readonly IMapper _mapper;
 
-        public MeetupAdminService(BaseDbContext baseDbContext)
+        public AdminMeetupService(BaseDbContext baseDbContext, IMapper mapper)
         {
             _context = baseDbContext;
+            _mapper = mapper;
         }
         public async Task CreateAsync(Meetup meetup)
         {
-
+            var user = await _context.Users.FirstOrDefaultAsync(c=>c.Id==meetup.CreatedByUser);
+            meetup.UserCreator = user;
             await _context.Meetups.AddAsync(meetup);
             await _context.SaveChangesAsync();
         }
@@ -45,17 +50,19 @@ namespace ConnectUs.Infrastructure.Repositories
             return await _context.Meetups.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
         }
 
-        public IEnumerable<Meetup> GetMeetups(string userId)
+        public IEnumerable<Meetup> GetMyMeetups(string userId)
         {
             return _context.Meetups.ToList().Where(c => c.CreatedByUser== userId).Reverse();
         }
 
-        public async Task<bool> Update(Meetup meetup, string userId)
+        public async Task<bool> Update(MeetupUpdateDTO meetup, string userId, string meetupId)
         {
-            if (meetup.CreatedByUser== userId)
+            var meetupOriginal = _context.Meetups.FirstOrDefault(c=>c.Id==Guid.Parse(meetupId));
+            var res = _mapper.Map<MeetupUpdateDTO,Meetup>(meetup, meetupOriginal);
+            if (res.CreatedByUser.ToLower()== userId.ToLower())
             {
 
-                _context.Meetups.Update(meetup);
+                _context.Meetups.Update(res);
                 await _context.SaveChangesAsync();
                 return true;
 

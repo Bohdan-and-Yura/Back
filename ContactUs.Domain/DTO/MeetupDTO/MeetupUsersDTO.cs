@@ -7,7 +7,6 @@ namespace ConnectUs.Domain.DTO.MeetupDTO
 {
     public class MeetupUsersDTO
     {
-        public string Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime MeetupDate { get; set; }

@@ -1,4 +1,5 @@
-﻿using ConnectUs.Domain.Entities;
+﻿using ConnectUs.Domain.DTO.AccountDTO;
+using ConnectUs.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,8 +9,7 @@ namespace ConnectUs.Domain.IRepositories
 {
     public interface IUserService
     {
-        IEnumerable<User> GetAll();
+        IEnumerable<UserListDTO> GetAll();
         Task<User> GetByIdAsync(string id);
-        Task<bool> Delete(string id);
     }
 }

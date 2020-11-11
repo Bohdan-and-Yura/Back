@@ -23,9 +23,9 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     public class AdminMeetupController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IMeetupAdminService _meetup;
+        private readonly IAdminMeetupService _meetup;
 
-        public AdminMeetupController(IMapper mapper, IMeetupAdminService meetup)
+        public AdminMeetupController(IMapper mapper, IAdminMeetupService meetup)
         {
             _mapper = mapper;
             _meetup = meetup;
@@ -50,7 +50,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
                 var response = _mapper.Map<MeetupResponseDTO>(meetup);
                 return Ok(new ResponseModel<MeetupResponseDTO>(response));
             }
-            return BadRequest(new ResponseModel<CreateMeetupDTO>("Create failed", meetupDto));
+            return BadRequest(new ResponseModel<CreateMeetupDTO>("Wrong data", meetupDto));
 
         }
         /// <summary>
@@ -69,7 +69,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             {
                 return Ok(new ResponseModel<MeetupResponseDTO>());
             }
-            return (new ResponseModel<MeetupResponseDTO>("Forbidden"));
+            return NotFound(new ResponseModel<MeetupResponseDTO>("You don't own that meetup"));
             //return Forbid();
         }
         /// <summary>
@@ -85,7 +85,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             {
                 return Unauthorized(new ResponseModel<MeetupResponseDTO>("Smth went wrong"));
             }
-            var meetups = _meetup.GetMeetups(userId);
+            var meetups = _meetup.GetMyMeetups(userId);
             var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             return (new ResponseModel<IEnumerable<MeetupResponseDTO>>(result));
         }
@@ -99,16 +99,15 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         [HttpPut("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupUpdateDTO>>> Update(string meetupId, [FromBody] MeetupUpdateDTO meetupUpdateDTO)
         {
-            var meetup = _mapper.Map<Meetup>(meetupUpdateDTO);
-            meetup.Id = Guid.Parse(meetupId);
+            
             string userId = HttpContext.Request.Cookies["X-Username"];
 
-            var result = await _meetup.Update(meetup, userId);
+            var result = await _meetup.Update(meetupUpdateDTO, userId, meetupId);
             if (result)
             {
                 return Ok(new ResponseModel<MeetupUpdateDTO>(meetupUpdateDTO));
             }
-            return Forbid();
+            return NotFound(new ResponseModel<MeetupResponseDTO>("You don't own that meetup"));
 
         }
         /// <summary>
@@ -116,7 +115,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
         /// </summary>
         /// <param name="meetupId"></param>
         /// <returns></returns>
-        ////[Authorize]
+        //[Authorize]
         [HttpGet("{meetupId}")]
         public async Task<ActionResult<ResponseModel<MeetupResponseDTO>>> Fetch(string meetupId)
         {

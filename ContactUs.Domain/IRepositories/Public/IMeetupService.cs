@@ -13,8 +13,8 @@ namespace ConnectUs.Domain.IRepositories
     {
         Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState,bool isDescending=false);
         Task<Meetup> GetByIdAsync(string meetupId);
-        Task AddUserToMeetup(Meetup meetup, User user);
+        Task<bool> JoinMeetup(Meetup meetup, User user);
         List<MeetupUser> GetJoinedMeetups(string userId);
-        void UnjoinMeetup(string userId, string meetupId);
+        Task<bool> UnjoinMeetup(string userId, string meetupId);
     }
 }

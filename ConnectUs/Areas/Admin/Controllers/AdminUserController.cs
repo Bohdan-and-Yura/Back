@@ -22,10 +22,10 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
     //[Authorize(Roles = Role.Admin)]
     public class AdminUserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAdminUserService _userService;
         private readonly IMapper _mapper;
 
-        public AdminUserController(IUserService userService, IMapper mapper)
+        public AdminUserController(IAdminUserService userService, IMapper mapper)
         {
             _userService = userService;
             _mapper = mapper;
@@ -43,7 +43,7 @@ namespace ConnectUs.Web.Areas.Admin.Controllers
             var result = _userService.Delete(id);
             if (result.Result == false)
             {
-                return BadRequest(new ResponseModel<UserDataDTO>("user not found"));
+                return BadRequest(new ResponseModel<UserDataDTO>("User not found"));
             }
             return Ok(new ResponseModel<UserDataDTO>());
         }

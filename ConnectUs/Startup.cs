@@ -112,7 +112,7 @@ namespace ConnectUs
             services.AddTransient<IAccountService, AccountService>();
             services.AddScoped<IMeetupService, MeetupService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IMeetupAdminService, MeetupAdminService>();
+            services.AddScoped<IAdminMeetupService, AdminMeetupService>();
 
 
             services.AddIdentity<User, IdentityRole>()

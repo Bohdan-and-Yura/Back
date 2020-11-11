@@ -10,15 +10,14 @@ using System.Threading.Tasks;
 
 namespace ConnectUs.Infrastructure.Repositories
 {
-    public class UserService : IUserService
+    public class AdminUserService: IAdminUserService
     {
         private readonly BaseDbContext _context;
 
-        public UserService(BaseDbContext baseDbContext)
+        public AdminUserService(BaseDbContext context)
         {
-            _context = baseDbContext;
+            _context = context;
         }
-
         public async Task<bool> Delete(string id)
         {
             var user = _context.Users.FirstOrDefault(x => x.Id == (id));
@@ -29,9 +28,10 @@ namespace ConnectUs.Infrastructure.Repositories
             return true;
         }
 
+
         public IEnumerable<User> GetAll()
         {
-            return _context.Users.Include(c=>c.MeetupsJoined).ToList().Where(c=>c.MeetupsJoined.Count>0);
+            return _context.Users.Include(c => c.MeetupsJoined).ToList().Where(c => c.MeetupsJoined.Count > 0);
         }
 
         public async Task<User> GetByIdAsync(string id)
@@ -39,7 +39,5 @@ namespace ConnectUs.Infrastructure.Repositories
             var user = await _context.Users.Include(c => c.MeetupsJoined).FirstOrDefaultAsync(x => x.Id == id);
             return user.WithoutPassword();
         }
-
-
     }
 }

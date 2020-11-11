@@ -27,18 +27,20 @@ namespace ConnectUs.Infrastructure.Repositories
         public List<MeetupUser> GetJoinedMeetups(string userId)
         {
 
-            var user = _context.Users.FirstOrDefault(c => c.Id == userId);
+            var user = _context.Users.Include(c=>c.MeetupsJoined).FirstOrDefault(c => c.Id == userId);
+
             var meetups = user.MeetupsJoined.ToList();
             return meetups;
         }
 
-        public void UnjoinMeetup(string userId, string meetupId)
-        {
-            var user = _context.Users.FirstOrDefault(c => c.Id == userId);
 
-        }
-        public async Task AddUserToMeetup(Meetup meetup, User user)
+        public async Task<bool> JoinMeetup(Meetup meetup, User user)
         {
+           var result= _context.MeetupsUsers.Any(c => c.MeetupId == meetup.Id && c.UserId == user.Id);
+            if (result)
+            {
+                return false;
+            }
             MeetupUser mu = new MeetupUser();
             mu.Meetup = meetup;
             mu.User = user;
@@ -46,14 +48,15 @@ namespace ConnectUs.Infrastructure.Repositories
             meetup.UsersJoined.Add(mu);
             _context.MeetupsUsers.Add(mu);
             await _context.SaveChangesAsync();
+            return true;
 
         }
-       
+
         public async Task<Meetup> GetByIdAsync(string meetupId)
         {
             try
             {
-                return await _context.Meetups/*.Include(c=>c.Users)*/.FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
+                return await _context.Meetups.Include(c => c.UsersJoined).FirstOrDefaultAsync(c => c.Id == Guid.Parse(meetupId));
             }
             catch
             {
@@ -121,6 +124,23 @@ namespace ConnectUs.Infrastructure.Repositories
             }
 
             return result;
+        }
+
+        public async Task<bool> UnjoinMeetup(string userId, string meetupId)
+        {
+            try
+            {
+                var result = await _context.MeetupsUsers.FirstOrDefaultAsync(c => c.MeetupId == Guid.Parse(meetupId) && c.UserId == userId);
+                _context.MeetupsUsers.Remove(result);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+
+                return true;
+            }
+
         }
     }
 }
