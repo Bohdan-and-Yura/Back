@@ -59,51 +59,50 @@ namespace ConnectUs.Infrastructure.Repositories.Public
             }
         }
 
-        public async Task<IEnumerable<MeetupResponseDTO>> GetList(string searchQuery, SortState sortState,
+        public IEnumerable<MeetupResponseDTO> GetList(string searchQuery, SortState sortState,
             bool isDescending = false)
         {
-            var meetups = await _context.Meetups.ToListAsync();
+            IQueryable<Meetup> meetups = _context.Meetups;
 
-            var result = _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups);
             if (isDescending == false)
+            {
                 switch (sortState)
                 {
                     case SortState.Title:
-                        result.OrderBy(c => c.Title);
-                        if (!string.IsNullOrEmpty(searchQuery)) result.Where(c => c.Title.Contains(searchQuery));
+                        if (!string.IsNullOrEmpty(searchQuery)) meetups = meetups.Where(c => c.Title.Contains(searchQuery)).OrderBy(c => c.Title);
                         break;
                     case SortState.MeetupDate:
-                        result.OrderBy(c => c.MeetupDate);
+                        meetups = meetups.OrderBy(c => c.MeetupDate).Reverse();
                         break;
                     case SortState.City:
-                        result.OrderBy(c => c.City);
-                        if (!string.IsNullOrEmpty(searchQuery)) result.Where(c => c.City.Contains(searchQuery));
+                        if (!string.IsNullOrEmpty(searchQuery)) meetups = meetups.Where(c => c.City.Contains(searchQuery)).OrderBy(c => c.City);
                         break;
                     default:
-                        result.OrderBy(c => c.Title);
+                        meetups = meetups.OrderBy(c => c.Title);
                         break;
                 }
+            }
 
             if (isDescending)
+            {
                 switch (sortState)
                 {
                     case SortState.Title:
-                        result.OrderByDescending(c => c.Title);
-                        if (!string.IsNullOrEmpty(searchQuery)) result.Where(c => c.Title.Contains(searchQuery));
+                        if (!string.IsNullOrEmpty(searchQuery)) meetups = meetups.Where(c => c.Title.Contains(searchQuery)).OrderByDescending(c => c.Title);
                         break;
                     case SortState.MeetupDate:
-                        result.OrderByDescending(c => c.MeetupDate);
+                        meetups = meetups.OrderByDescending(c => c.MeetupDate).Reverse();
                         break;
                     case SortState.City:
-                        result.OrderByDescending(c => c.City);
-                        if (!string.IsNullOrEmpty(searchQuery)) result.Where(c => c.City.Contains(searchQuery));
+                        if (!string.IsNullOrEmpty(searchQuery)) meetups = meetups.Where(c => c.City.Contains(searchQuery)).OrderByDescending(c => c.City); ;
                         break;
                     default:
-                        result.OrderBy(c => c.Title);
+                        meetups = meetups.OrderBy(c => c.Title);
                         break;
                 }
+            }
+            return  _mapper.Map<IEnumerable<MeetupResponseDTO>>(meetups.ToList());
 
-            return result;
         }
 
         public async Task<bool> UnjoinMeetup(string userId, string meetupId)

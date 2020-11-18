@@ -9,8 +9,7 @@ namespace ConnectUs.Domain.IRepositories.Public
 {
     public interface IMeetupService
     {
-        Task<IEnumerable<MeetupResponseDTO>>
-            GetList(string searchQuery, SortState sortState, bool isDescending = false);
+        IEnumerable<MeetupResponseDTO> GetList(string searchQuery, SortState sortState, bool isDescending = false);
 
         Task<Meetup> GetByIdAsync(string meetupId);
         Task<bool> JoinMeetup(Meetup meetup, User user);

@@ -35,14 +35,14 @@ namespace ConnectUs.Web.Areas.Public.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<ResponseModel<HomeIndexResponse>>> Index([FromQuery] int page = 1,
+        public ActionResult<ResponseModel<HomeIndexResponse>> Index([FromQuery] int page = 1,
             string searchQuery = "", SortState sortState = SortState.MeetupDate, bool isDescending = false,
             int meetupsCount = 18)
         {
             var pageSize = 18;
 
-            var meetups = await _meetup.GetList(searchQuery, sortState, isDescending);
-            meetups.Reverse();
+            var meetups = _meetup.GetList(searchQuery, sortState, isDescending);
+            //
             var pageViewModel = new PageViewModel(meetups.Count(), page, pageSize);
             var items = meetups.Skip(page - 1).Take(meetupsCount);
 
